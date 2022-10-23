@@ -15,6 +15,11 @@ export class UsersService {
         await this.sendMemberJoinEmail(email, signupVerifyToken);
     }
 
+    async verifyEmail(signupVerifyToken: string): Promise<string> {
+
+        throw new Error('Method not implemented.');
+    }
+
     private checkUserExists(email: string) {
         return false;
     }
@@ -24,7 +29,8 @@ export class UsersService {
     }
 
     private async sendMemberJoinEmail(email: string, signupVerifyToken: string) {
-        //await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
-        return;
+        await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
     }
+
+
 }

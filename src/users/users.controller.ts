@@ -12,13 +12,14 @@ export class UsersController {
     @Post()
     async createUser(@Body() dto: CreateUserDto): Promise<void>{
         const { name, email, password } = dto;
-        //await this.userService.createUser(name, email, password);
+        await this.userService.createUser(name, email, password);
     }
 
     @Post('/email-verify')
     async verifyEmail(@Query() dto: VerifyEmailDto): Promise<string> {
-        console.log(dto);
-        return;
+        const { signupVerifyToken } = dto;
+        
+        return await this.userService.verifyEmail(signupVerifyToken);
     }
 
     @Post('/login')
