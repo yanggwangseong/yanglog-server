@@ -4,13 +4,14 @@ import { EmailService } from 'src/email/email.service';
 import { UserInfo } from './UserInfo';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ulid } from 'ulid';
 @Injectable()
 export class UsersService {
     constructor(
         private emailService: EmailService,
         @InjectRepository(UserEntity) private usersRepository: Repository<UserEntity>,
+        private dataSource: DataSource,
         ){}
     
     async createUser(name: string, email: string, password: string) {
@@ -47,13 +48,32 @@ export class UsersService {
     }
 
     private async saveUser(name: string, email: string, password: string, signupVerifyToken: string) {
-        const user = new UserEntity();
-        user.id = ulid();
-        user.name = name;
-        user.email = email;
-        user.password = password;
-        user.signiupVerifyToken = signupVerifyToken;
-        await this.usersRepository.save(user);
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const user = new UserEntity();
+            user.id = ulid();
+            user.name = name;
+            user.email = email;
+            user.password = password;
+            user.signiupVerifyToken = signupVerifyToken;
+
+            //await this.usersRepository.save(user);
+            await queryRunner.manager.save(user);
+            //트랜잭션 테스트 위한 에러발생
+            //throw new InternalServerErrorException();
+            await queryRunner.commitTransaction();
+
+        } catch (e) {
+            //error
+            await queryRunner.rollbackTransaction();
+        } finally {
+            await queryRunner.release();
+        }
+        
     }
 
     private async sendMemberJoinEmail(email: string, signupVerifyToken: string) {
