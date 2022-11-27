@@ -1,5 +1,5 @@
 import * as uuid from 'uuid';
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
 import { UserInfo } from './UserInfo';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,8 +22,10 @@ export class UsersService {
 
         const signupVerifyToken = uuid.v1();
 
-        await this.saveUser(name, email, password, signupVerifyToken);
-        await this.sendMemberJoinEmail(email, signupVerifyToken);
+        const chkSaveUser = await this.saveUser(name, email, password, signupVerifyToken);
+        if(chkSaveUser){
+            await this.sendMemberJoinEmail(email, signupVerifyToken);
+        }
     }
 
     async verifyEmail(signupVerifyToken: string): Promise<string> {
@@ -69,10 +71,14 @@ export class UsersService {
 
         } catch (e) {
             //error
+            //console.log("에러발생체크");
             await queryRunner.rollbackTransaction();
+            return false;
         } finally {
             await queryRunner.release();
         }
+
+        return true;
         
     }
 
