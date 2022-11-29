@@ -1,15 +1,17 @@
 import * as uuid from 'uuid';
-import { Injectable, InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
 import { UserInfo } from './UserInfo';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ulid } from 'ulid';
+import { AuthService } from 'src/auth/auth.service';
 @Injectable()
 export class UsersService {
     constructor(
         private emailService: EmailService,
+        private authService: AuthService,
         @InjectRepository(UserEntity) private usersRepository: Repository<UserEntity>,
         private dataSource: DataSource,
         ){}
@@ -29,13 +31,32 @@ export class UsersService {
     }
 
     async verifyEmail(signupVerifyToken: string): Promise<string> {
+        
+        const user = await this.usersRepository.findOneBy({ signupVerifyToken:signupVerifyToken });
 
-        throw new Error('Method not implemented.');
+        if (!user ) {
+            throw new NotFoundException('유저가 존재하지 않습니다.');
+        }
+
+        return this.authService.login({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        })
     }
 
     async login(email: string, password: string): Promise<string> {
 
-        throw new Error('Method not implemented.');
+        const user = await this.usersRepository.findOneBy({email: email, password: password});
+        if (!user) {
+            throw new NotFoundException('유저가 존재하지 않습니다.');
+        }
+
+        return this.authService.login({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        })
     }
 
     async getUserInfo(userId: string): Promise<UserInfo> {
@@ -61,7 +82,7 @@ export class UsersService {
             user.name = name;
             user.email = email;
             user.password = password;
-            user.signiupVerifyToken = signupVerifyToken;
+            user.signupVerifyToken = signupVerifyToken;
 
             //await this.usersRepository.save(user);
             await queryRunner.manager.save(user);

@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { UsersController } from './users/users.controller';
+import { AuthModule } from './auth/auth.module';
+import { AuthsService } from './auths/auths.service';
 
 @Module({
   imports: [
@@ -19,10 +21,11 @@ import { UsersController } from './users/users.controller';
       isGlobal: true,
       validationSchema,
     }),
+    AuthModule,
   
   ],
   controllers: [],
-  providers: [],
+  providers: [AuthsService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer): any {

@@ -15,6 +15,6 @@ export class UserEntity {
     password: string;
 
     @Column({ length: 60 })
-    signiupVerifyToken: string;
+    signupVerifyToken: string;
     
 }
