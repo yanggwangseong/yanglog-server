@@ -9,7 +9,8 @@ import { typeORMConfig } from './config/typeorm.config';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { UsersController } from './users/users.controller';
 import { AuthModule } from './auth/auth.module';
-import { AuthsService } from './auths/auths.service';
+import { AuthService } from './auth/auth.service';
+import authConfig from './config/authConfig';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { AuthsService } from './auths/auths.service';
     UsersModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
-      load: [emailConfig],
+      load: [emailConfig, authConfig],
       isGlobal: true,
       validationSchema,
     }),
@@ -25,7 +26,7 @@ import { AuthsService } from './auths/auths.service';
   
   ],
   controllers: [],
-  providers: [AuthsService],
+  providers: [AuthService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer): any {
