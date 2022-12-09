@@ -4,6 +4,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { UserEntity } from './entities/user.entity';
 import { UserInfo } from './UserInfo';
 import { UsersService } from './users.service';
 
@@ -43,4 +44,16 @@ export class UsersController {
 
         return await this.userService.getUserInfo(userId);
     }
+
+    @UseGuards(AuthGuard)
+    @Get('')
+    async getUserAll(): Promise<UserEntity[]> {
+        //const jwtString = headers.authorization.split('Bearer ')[1];
+
+        //this.authService.verify(jwtString); AuthGuard로 대체
+
+        return await this.userService.getUserAll();
+    }
+
+    
 }

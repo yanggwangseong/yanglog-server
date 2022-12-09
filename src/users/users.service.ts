@@ -3,7 +3,7 @@ import { Injectable, InternalServerErrorException, NotFoundException, Unprocessa
 import { EmailService } from 'src/email/email.service';
 import { UserInfo } from './UserInfo';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity';
+import { UserEntity } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ulid } from 'ulid';
 import { AuthService } from 'src/auth/auth.service';
@@ -60,7 +60,6 @@ export class UsersService {
     }
 
     async getUserInfo(userId: string): Promise<UserInfo> {
-
         const user = await this.usersRepository.findOneBy({ id: userId });
 
         if (!user){
@@ -72,7 +71,11 @@ export class UsersService {
             name: user.name,
             email: user.email,
         }
-        
+    }
+
+    async getUserAll(): Promise<UserEntity[]> {
+
+        return await this.usersRepository.find();
     }
 
     private async checkUserExists(emailAddress: string): Promise<boolean> {

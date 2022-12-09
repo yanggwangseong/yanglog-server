@@ -15,7 +15,6 @@ import authConfig from './config/authConfig';
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeORMConfig),
-    UsersModule,
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
       load: [emailConfig, authConfig],
@@ -23,7 +22,7 @@ import authConfig from './config/authConfig';
       validationSchema,
     }),
     AuthModule,
-  
+    UsersModule,
   ],
   controllers: [],
   providers: [AuthService],
