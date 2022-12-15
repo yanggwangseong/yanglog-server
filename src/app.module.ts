@@ -10,6 +10,7 @@ import { LoggerMiddleware } from './logger/logger.middleware';
 import { UsersController } from './users/users.controller';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
+import { PostsModule } from './posts/posts.module';
 import authConfig from './config/authConfig';
 
 @Module({
@@ -23,6 +24,7 @@ import authConfig from './config/authConfig';
     }),
     AuthModule,
     UsersModule,
+    PostsModule,
   ],
   controllers: [],
   providers: [AuthService],
