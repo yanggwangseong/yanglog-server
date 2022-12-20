@@ -12,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { PostsModule } from './posts/posts.module';
 import authConfig from './config/authConfig';
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
 @Module({
   imports: [
@@ -21,6 +23,17 @@ import authConfig from './config/authConfig';
       load: [emailConfig, authConfig],
       isGlobal: true,
       validationSchema,
+    }),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          level: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            nestWinstonModuleUtilities.format.nestLike('MyApp', { prettyPrint: true }),
+          )
+        })
+      ]
     }),
     AuthModule,
     UsersModule,
