@@ -45,18 +45,20 @@ export class UsersService {
         })
     }
 
-    async login(email: string, password: string): Promise<string> {
+    async login(email: string, password: string): Promise<{accessToken: string}> {
 
         const user = await this.usersRepository.findOneBy({email: email, password: password});
         if (!user) {
             throw new NotFoundException('유저가 존재하지 않습니다.');
         }
 
-        return this.authService.login({
+        const accessToken = this.authService.login({
             id: user.id,
             name: user.name,
             email: user.email,
-        })
+        });
+
+        return { accessToken : accessToken };
     }
 
     async getUserInfo(userId: string): Promise<UserInfo> {
