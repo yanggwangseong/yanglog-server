@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Headers, UseGuards, Inject } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Headers, UseGuards, Inject, Req, Res } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger as WinstonLogger } from 'winston';
 import { AuthGuard } from 'src/auth.guard';
@@ -9,6 +9,9 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserInfo } from './UserInfo';
 import { UsersService } from './users.service';
+import { Request, Response } from 'express';
+import { AccessTokenGuard } from 'src/guards/accessToken.guard';
+import { refreshTokenGuard } from 'src/guards/refreshToken.guard';
 
 @Controller('users')
 export class UsersController {
@@ -50,6 +53,39 @@ export class UsersController {
         const { email, password } = dto;
 
         return await this.userService.login(email, password);
+    }
+
+    //new
+    @Post('/signin')
+    async signin(
+        @Res({passthrough: true}) res: Response, 
+        @Body() dto: UserLoginDto
+        ): Promise<{accessToken:string}>{
+        const { email, password } = dto;
+        const tokens =  await this.userService.signin(email, password);
+        res.cookie('Authentication', tokens.refreshToken, {
+            domain: 'localhost',
+            path: '/',
+            httpOnly: true,
+        });
+        
+        return {accessToken: tokens.accessToken};
+    }
+
+    //new
+    @UseGuards(AccessTokenGuard)
+    @Get('/logout')
+    logout(@Req() req: Request):boolean {
+        return true
+    }
+
+    //new
+    @UseGuards(refreshTokenGuard)
+    @Get('/refreshtoken')
+    async refreshTokens(@Req() req: Request){
+        const id = req.user['sub'];
+        const refreshToken = req.user['refreshToken'];
+        return await this.userService.refreshTokens(id,refreshToken);
     }
 
     @UseGuards(AuthGuard)

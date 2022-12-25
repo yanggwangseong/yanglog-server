@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import * as path from "path";
 import { ValidationPipe } from '@nestjs/common';
 import { logger3 } from './logger/logger3.middleware';
+import * as cookieParser from 'cookie-parser';
 
 dotenv.config({
   path: path.resolve(
@@ -19,6 +20,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
     transform : true,
   }));
+  //cookieParser
+  app.use(cookieParser());
   await app.listen(3001);
 }
 bootstrap();

@@ -17,6 +17,6 @@ export class UserEntity {
     @Column({ length: 60 })
     signupVerifyToken: string;
     
-    @Column({length: 60})
-    refreshToken: string;
+    @Column({length: 60, nullable: true})
+    refreshToken: string | null;
 }

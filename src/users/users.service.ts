@@ -7,6 +7,10 @@ import { UserEntity } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ulid } from 'ulid';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class UsersService {
     constructor(
@@ -14,6 +18,8 @@ export class UsersService {
         private authService: AuthService,
         @InjectRepository(UserEntity) private usersRepository: Repository<UserEntity>,
         private dataSource: DataSource,
+        private jwtService: JwtService,
+        private configService: ConfigService,
         ){}
     
     async createUser(name: string, email: string, password: string) {
@@ -61,6 +67,71 @@ export class UsersService {
         return { accessToken : accessToken };
     }
 
+    async signin(email: string, password: string): Promise<{accessToken: string, refreshToken:string}>{
+        const user = await this.usersRepository.findOneBy({email: email, password: password});
+        if (!user) {
+            throw new NotFoundException('유저가 존재하지 않습니다.');
+        }
+
+        const tokens = await this.getTokens(user.id,user.name);
+        await this.updateRefreshToken(user.id,tokens.refreshToken);
+        return tokens;
+    }
+
+    async updateRefreshToken(id:string, refreshToken: string){
+        const user = await this.usersRepository.findOneBy({id: id});
+        const hashedRefreshToken = await this.hashData(refreshToken);
+        user.refreshToken = hashedRefreshToken;
+        await this.usersRepository.save(user);
+    }
+
+    async hashData(refreshToken: string){
+        const salt = await bcrypt.genSalt();
+        return await bcrypt.hash(refreshToken,salt);
+    }
+
+    async getTokens(id: string, name: string ){
+        const accessToken = await this.jwtService.signAsync(
+            {
+                sub: id,
+                username: name,
+            },
+            {
+                secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+                expiresIn: '15m',
+            }
+        );
+        const refreshToken = await this.jwtService.signAsync(
+            {
+                sub: id,
+                username: name,
+            },
+            {
+                secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+                expiresIn: '7d',
+            }
+        );
+        
+        return {
+            accessToken,
+            refreshToken
+        }
+    }
+
+    async refreshTokens(id: string, refreshToken: string){
+        const user = await this.usersRepository.findOneBy({id: id});
+        if (!user || !user.refreshToken) {
+            throw new NotFoundException('유저가 존재하지 않습니다.');
+        }
+        const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+        if(!refreshTokenMatches) throw new NotFoundException('유저가 존재하지 않습니다.');
+        const tokens = await this.getTokens(user.id, user.name);
+        await this.updateRefreshToken(user.id,tokens.refreshToken);
+        return tokens;
+    }
+
+    
+
     async getUserInfo(userId: string): Promise<UserInfo> {
         const user = await this.usersRepository.findOneBy({ id: userId });
 
@@ -99,6 +170,7 @@ export class UsersService {
             user.email = email;
             user.password = password;
             user.signupVerifyToken = signupVerifyToken;
+            user.refreshToken = "";
 
             //await this.usersRepository.save(user);
             await queryRunner.manager.save(user);
