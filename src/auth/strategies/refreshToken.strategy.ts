@@ -10,18 +10,27 @@ export class RefreshTokenStrategy extends PassportStrategy(
 ){
     constructor(){
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                RefreshTokenStrategy.extractJWT,
+                ExtractJwt.fromAuthHeaderAsBearerToken()
+            ]),
             secretOrKey: process.env.JWT_REFRESH_SECRET,
             passReqToCallback: true,
         });
     }
 
     validate(req: Request, payload: any){
-        
+       
         if(!req.cookies.Authentication) throw new UnauthorizedException();
         //const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
-        //console.log(refreshToken);
+       
         const refreshToken = req.cookies.Authentication;
         return { ...payload, refreshToken };
+    }
+    private static extractJWT(req: Request): string | null{
+        if (req.cookies && 'Authentication' in req.cookies){
+            return req.cookies.Authentication;
+        }
+        return null;
     }
 }

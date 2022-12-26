@@ -82,13 +82,34 @@ export class UsersController {
     //new
     @UseGuards(refreshTokenGuard)
     @Get('/refreshtoken')
-    async refreshTokens(@Req() req: Request){
+    async refreshTokens(
+        @Req() req: Request,
+        @Res({passthrough: true}) res: Response,
+        ){
+        
         const id = req.user['sub'];
         const refreshToken = req.user['refreshToken'];
-        return await this.userService.refreshTokens(id,refreshToken);
+        
+        const tokens = await this.userService.refreshTokens(id,refreshToken);
+        res.cookie('Authentication', tokens.refreshToken, {
+            domain: 'localhost',
+            path: '/',
+            httpOnly: true,
+        });
+        
+        return {accessToken: tokens.accessToken};
+    }
+    @UseGuards(AccessTokenGuard)
+    @Get('/checkUser')
+    async checkUser(
+        @Req() req: Request,
+    ){
+        console.log(req.user);
+        return true;
     }
 
-    @UseGuards(AuthGuard)
+    //@UseGuards(AuthGuard)
+    @UseGuards(AccessTokenGuard)
     @Get('/:id')
     async getUserInfo(@Headers() headers:any, @Param('id') userId: string): Promise<UserInfo> {
         //const jwtString = headers.authorization.split('Bearer ')[1];
