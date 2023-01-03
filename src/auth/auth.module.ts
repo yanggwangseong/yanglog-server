@@ -5,9 +5,9 @@ import { AccessTokenStrategy } from './strategies/accessToken.strategy';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 
 @Module({
-  imports: [JwtModule.register({}),],
-  controllers: [],
-  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
-  exports: [AuthService,JwtModule]
+	imports: [JwtModule.register({})],
+	controllers: [],
+	providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
+	exports: [AuthService, JwtModule],
 })
-export class AuthModule { }
+export class AuthModule {}
