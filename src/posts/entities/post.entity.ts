@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 @Entity('Post')
 export class PostEntity {
 	@PrimaryColumn()
-	postId: Number;
+	postId: string;
 
 	@Column()
 	title: string;

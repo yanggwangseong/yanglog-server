@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { ValidationPipe } from '@nestjs/common';
-import { logger3 } from './logger/logger3.middleware';
 import * as cookieParser from 'cookie-parser';
 
 dotenv.config({
@@ -26,7 +25,6 @@ async function bootstrap() {
 		allowedHeaders: 'Content-Type, Accept, Authorization',
 	};
 	app.enableCors(options);
-	app.use(logger3);
 	app.useGlobalPipes(
 		new ValidationPipe({
 			transform: true,
@@ -36,4 +34,5 @@ async function bootstrap() {
 	app.use(cookieParser());
 	await app.listen(3001);
 }
+
 bootstrap();

@@ -1,4 +1,5 @@
 import * as uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import {
 	Injectable,
 	InternalServerErrorException,
@@ -11,7 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ulid } from 'ulid';
-import { AuthService } from 'src/auth/auth.service';
+
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -20,10 +21,11 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
 	constructor(
 		private emailService: EmailService,
-		private authService: AuthService,
+
 		@InjectRepository(UserEntity)
 		private usersRepository: Repository<UserEntity>,
 		private dataSource: DataSource,
+
 		private jwtService: JwtService,
 		private configService: ConfigService,
 	) {}
@@ -49,7 +51,9 @@ export class UsersService {
 		}
 	}
 
-	async verifyEmail(signupVerifyToken: string): Promise<string> {
+	async verifyEmail(
+		signupVerifyToken: string,
+	): Promise<{ accessToken: string; refreshToken: string }> {
 		const user = await this.usersRepository.findOneBy({
 			signupVerifyToken: signupVerifyToken,
 		});
@@ -58,32 +62,13 @@ export class UsersService {
 			throw new NotFoundException('유저가 존재하지 않습니다.');
 		}
 
-		return this.authService.login({
-			id: user.id,
-			name: user.name,
-			email: user.email,
-		});
-	}
-
-	async login(
-		email: string,
-		password: string,
-	): Promise<{ accessToken: string }> {
-		const user = await this.usersRepository.findOneBy({
-			email: email,
-			password: password,
-		});
-		if (!user) {
-			throw new NotFoundException('유저가 존재하지 않습니다.');
-		}
-
-		const accessToken = this.authService.login({
-			id: user.id,
-			name: user.name,
-			email: user.email,
-		});
-
-		return { accessToken: accessToken };
+		// return this.authService.login({
+		// 	id: user.id,
+		// 	name: user.name,
+		// 	email: user.email,
+		// });
+		const tokens = await this.getTokens(user.id, user.name);
+		return tokens;
 	}
 
 	async signin(
@@ -130,7 +115,7 @@ export class UsersService {
 			},
 			{
 				secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-				expiresIn: '1m',
+				expiresIn: '5m',
 			},
 		);
 		const refreshToken = await this.jwtService.signAsync(
@@ -188,10 +173,6 @@ export class UsersService {
 		};
 	}
 
-	async getUserAll(): Promise<UserEntity[]> {
-		return await this.usersRepository.find();
-	}
-
 	private async checkUserExists(emailAddress: string): Promise<boolean> {
 		const user = await this.usersRepository.findOneBy({ email: emailAddress });
 
@@ -210,7 +191,7 @@ export class UsersService {
 
 		try {
 			const user = new UserEntity();
-			user.id = ulid();
+			user.id = uuidv4();
 			user.name = name;
 			user.email = email;
 			user.password = password;

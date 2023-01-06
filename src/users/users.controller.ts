@@ -13,8 +13,6 @@ import {
 } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger as WinstonLogger } from 'winston';
-import { AuthGuard } from 'src/auth.guard';
-import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
@@ -29,7 +27,7 @@ import { refreshTokenGuard } from 'src/guards/refreshToken.guard';
 export class UsersController {
 	constructor(
 		private userService: UsersService,
-		private authService: AuthService,
+
 		@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
 	) {}
 
@@ -53,17 +51,12 @@ export class UsersController {
 	}
 
 	@Post('/email-verify')
-	async verifyEmail(@Query() dto: VerifyEmailDto): Promise<string> {
+	async verifyEmail(
+		@Query() dto: VerifyEmailDto,
+	): Promise<{ accessToken: string; refreshToken: string }> {
 		const { signupVerifyToken } = dto;
 
 		return await this.userService.verifyEmail(signupVerifyToken);
-	}
-
-	@Post('/login')
-	async login(@Body() dto: UserLoginDto): Promise<{ accessToken: string }> {
-		const { email, password } = dto;
-
-		return await this.userService.login(email, password);
 	}
 
 	//new
@@ -127,7 +120,6 @@ export class UsersController {
 		return await this.userService.getUserInfo(id);
 	}
 
-	//@UseGuards(AuthGuard)
 	@UseGuards(AccessTokenGuard)
 	@Get('/:id')
 	async getUserInfo(
@@ -139,15 +131,5 @@ export class UsersController {
 		//this.authService.verify(jwtString); AuthGuard로 대체
 
 		return await this.userService.getUserInfo(userId);
-	}
-
-	@UseGuards(AuthGuard)
-	@Get('')
-	async getUserAll(): Promise<UserEntity[]> {
-		//const jwtString = headers.authorization.split('Bearer ')[1];
-
-		//this.authService.verify(jwtString); AuthGuard로 대체
-
-		return await this.userService.getUserAll();
 	}
 }

@@ -13,8 +13,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { UsersController } from './users/users.controller';
-import { AuthModule } from './auth/auth.module';
-import { AuthService } from './auth/auth.service';
 import { PostsModule } from './posts/posts.module';
 import authConfig from './config/authConfig';
 import {
@@ -45,12 +43,11 @@ import * as winston from 'winston';
 				}),
 			],
 		}),
-		AuthModule,
 		UsersModule,
 		PostsModule,
 	],
 	controllers: [],
-	providers: [AuthService],
+	providers: [],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer): any {
