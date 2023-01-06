@@ -17,6 +17,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 
+import { Configuration, OpenAIApi } from 'openai';
+
 @Injectable()
 export class UsersService {
 	constructor(
@@ -24,6 +26,7 @@ export class UsersService {
 
 		@InjectRepository(UserEntity)
 		private usersRepository: Repository<UserEntity>,
+
 		private dataSource: DataSource,
 
 		private jwtService: JwtService,
@@ -82,11 +85,42 @@ export class UsersService {
 		if (!user) {
 			throw new NotFoundException('유저가 존재하지 않습니다.');
 		}
+		//await this.testAI();
 
 		const tokens = await this.getTokens(user.id, user.name);
 		await this.updateRefreshToken(user.id, tokens.refreshToken);
 		return tokens;
 	}
+	async testAI() {
+		const configuration = new Configuration({
+			apiKey: process.env.OPENAI_API_KEY,
+		});
+		const openai = new OpenAIApi(configuration);
+		const city = 'New York';
+		const topic = `Top 10 Restaurants you must visit when traveling to ${city}`;
+		const completion = await openai.createCompletion({
+			model: 'text-davinci-003',
+			prompt: `Write blog posts in markdown format.
+			Write the theme of your blog as ${topic}.
+			Highlight, bold, or italicize important words or sentences.
+			Please include the restaurant's address, menu recommendations and other helpful information(opening and closing hours) as a list style.
+			Please make the entire blog less than 10 minutes long.
+			The audience of this article is 20-40 years old.
+			Create several hashtags and add them only at the end of the line.
+			Add a summary of the entire article at the beginning of the blog post`,
+			//temperature: 0,
+			max_tokens: 2048,
+			//top_p: 0,
+			//frequency_penalty: 0,
+			//presence_penalty: 0,
+			temperature: 0.3,
+			top_p: 1,
+			frequency_penalty: 0,
+			presence_penalty: 0,
+		});
+		console.log(completion.data.choices[0].text);
+	}
+
 	async logout(id: string) {
 		this.updateRefreshToken(id, null);
 		return { logout: true };

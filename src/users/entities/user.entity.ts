@@ -1,22 +1,50 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { PostEntity } from 'src/posts/entities/post.entity';
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	OneToMany,
+	PrimaryColumn,
+	Unique,
+	UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('User')
+@Unique(['email'])
 export class UserEntity {
-	@PrimaryColumn()
+	@PrimaryColumn('uuid')
 	id: string;
 
-	@Column({ length: 30 })
+	@Column('varchar', { length: 30 })
 	name: string;
 
-	@Column({ length: 60 })
+	@Column('varchar', { length: 60 })
 	email: string;
 
-	@Column({ length: 30 })
+	@Column('varchar', { length: 60 })
 	password: string;
 
-	@Column({ length: 60 })
+	@Column('varchar', { length: 60 })
 	signupVerifyToken: string;
 
-	@Column({ length: 60, nullable: true })
+	@Column('varchar', { length: 60, nullable: true })
 	refreshToken: string | null;
+
+	@CreateDateColumn({
+		type: 'timestamp',
+		precision: 3,
+		default: () => 'CURRENT_TIMESTAMP',
+	})
+	createdAt: Date;
+
+	@UpdateDateColumn({
+		type: 'timestamp',
+		precision: 3,
+		default: () => 'CURRENT_TIMESTAMP',
+		// onUpdate: 'CURRENT_TIMESTAMP', mysql에서만 작동
+	})
+	updatedAt: Date;
+
+	@OneToMany((type) => PostEntity, (post) => post.user, { eager: true })
+	posts: PostEntity[];
 }
