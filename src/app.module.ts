@@ -19,6 +19,7 @@ import {
 	utilities as nestWinstonModuleUtilities,
 	WinstonModule,
 } from 'nest-winston';
+import { AuthModule } from './auth/auth.module';
 import * as winston from 'winston';
 
 @Module({
@@ -45,6 +46,7 @@ import * as winston from 'winston';
 		}),
 		UsersModule,
 		PostsModule,
+		AuthModule,
 	],
 	controllers: [],
 	providers: [],

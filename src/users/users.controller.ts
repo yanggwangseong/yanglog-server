@@ -83,6 +83,7 @@ export class UsersController {
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<{ logout: boolean }> {
+		console.log('test');
 		res.clearCookie('Authentication', {
 			domain: 'localhost',
 			path: '/',
