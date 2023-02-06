@@ -3,6 +3,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	Index,
 	OneToMany,
 	PrimaryColumn,
 	Unique,

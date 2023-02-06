@@ -11,7 +11,7 @@ import {
 @Entity('Post')
 export class PostEntity {
 	@PrimaryColumn('uuid')
-	postId: string;
+	id: string;
 
 	@Column('varchar', { length: 120 })
 	title: string;
@@ -19,11 +19,20 @@ export class PostEntity {
 	@Column('varchar', { length: 120 })
 	subtitle: string;
 
+	@Column('varchar', { length: 120 })
+	category: string;
+
 	@Column('text')
 	description: string;
 
+	@Column('varchar', { length: 120, nullable: true })
+	imageUrn: string | null;
+
 	@Column('uuid')
 	userId: string;
+
+	@ManyToOne((type) => UserEntity, (user) => user.posts, { eager: false })
+	user: UserEntity;
 
 	@CreateDateColumn({
 		type: 'timestamp',
@@ -38,9 +47,6 @@ export class PostEntity {
 		default: () => 'CURRENT_TIMESTAMP',
 	})
 	updatedAt: Date;
-
-	@ManyToOne((type) => UserEntity, (user) => user.posts, { eager: false })
-	user: UserEntity;
 
 	/*
 	postId: 5,

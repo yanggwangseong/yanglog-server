@@ -11,7 +11,6 @@ import { UserInfo } from './UserInfo';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
-import { ulid } from 'ulid';
 
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
