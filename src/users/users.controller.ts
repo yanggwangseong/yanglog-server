@@ -16,12 +16,14 @@ import { Logger as WinstonLogger } from 'winston';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity, UserRole } from './entities/user.entity';
 import { UserInfo } from './UserInfo';
 import { UsersService } from './users.service';
 import { Request, Response } from 'express';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { refreshTokenGuard } from 'src/guards/refreshToken.guard';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RolesGuard } from 'src/guards/role.guard';
 
 @Controller('users')
 export class UsersController {
@@ -65,6 +67,7 @@ export class UsersController {
 		@Res({ passthrough: true }) res: Response,
 		@Body() dto: UserLoginDto,
 	): Promise<{ accessToken: string }> {
+		this.logger.error('error: ', dto);
 		const { email, password } = dto;
 		const tokens = await this.userService.signin(email, password);
 		res.cookie('Authentication', tokens.refreshToken, {
@@ -112,6 +115,9 @@ export class UsersController {
 		return { accessToken: tokens.accessToken };
 	}
 
+	//@Roles('admin', 'user')
+	//@Roles(UserRole.ADMIN)
+	//@UseGuards(AccessTokenGuard, RolesGuard)
 	@UseGuards(AccessTokenGuard)
 	@Get('/checkUser')
 	async checkUser(@Req() req: Request) {

@@ -10,6 +10,12 @@ import {
 	UpdateDateColumn,
 } from 'typeorm';
 
+export enum UserRole {
+	ADMIN = 'admin',
+	USER = 'user',
+	GUEST = 'guest',
+}
+
 @Entity('User')
 @Unique(['email'])
 export class UserEntity {
@@ -30,6 +36,13 @@ export class UserEntity {
 
 	@Column('varchar', { length: 60, nullable: true })
 	refreshToken: string | null;
+
+	@Column({
+		type: 'enum',
+		enum: UserRole,
+		default: UserRole.USER,
+	})
+	role: UserRole;
 
 	@CreateDateColumn({
 		type: 'timestamp',

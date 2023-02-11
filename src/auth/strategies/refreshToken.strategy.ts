@@ -25,6 +25,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
 		const refreshToken = req.cookies.Authentication;
 		return { ...payload, refreshToken };
 	}
+
 	private static extractJWT(req: Request): string | null {
 		if (req.cookies && 'Authentication' in req.cookies) {
 			return req.cookies.Authentication;

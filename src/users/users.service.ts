@@ -9,7 +9,7 @@ import {
 import { EmailService } from 'src/email/email.service';
 import { UserInfo } from './UserInfo';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity, UserRole } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 
 import { JwtService } from '@nestjs/jwt';
@@ -69,7 +69,7 @@ export class UsersService {
 		// 	name: user.name,
 		// 	email: user.email,
 		// });
-		const tokens = await this.getTokens(user.id, user.name);
+		const tokens = await this.getTokens(user.id, user.name, user.role);
 		return tokens;
 	}
 
@@ -81,12 +81,13 @@ export class UsersService {
 			email: email,
 			password: password,
 		});
+
 		if (!user) {
 			throw new NotFoundException('유저가 존재하지 않습니다.');
 		}
 		//await this.testAI();
 
-		const tokens = await this.getTokens(user.id, user.name);
+		const tokens = await this.getTokens(user.id, user.name, user.role);
 		await this.updateRefreshToken(user.id, tokens.refreshToken);
 		return tokens;
 	}
@@ -140,11 +141,12 @@ export class UsersService {
 		return await bcrypt.hash(refreshToken, salt);
 	}
 
-	async getTokens(id: string, name: string) {
+	async getTokens(id: string, name: string, role: UserRole) {
 		const accessToken = await this.jwtService.signAsync(
 			{
 				sub: id,
 				username: name,
+				role: role,
 			},
 			{
 				secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
@@ -155,6 +157,7 @@ export class UsersService {
 			{
 				sub: id,
 				username: name,
+				role: role,
 			},
 			{
 				secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -179,7 +182,7 @@ export class UsersService {
 		);
 		if (!refreshTokenMatches)
 			throw new NotFoundException('유저가 존재하지 않습니다.');
-		const tokens = await this.getTokens(user.id, user.name);
+		const tokens = await this.getTokens(user.id, user.name, user.role);
 		await this.updateRefreshToken(user.id, tokens.refreshToken);
 		return tokens;
 	}
