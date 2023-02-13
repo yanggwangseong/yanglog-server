@@ -1,3 +1,4 @@
+import { CategoryEntity } from 'src/manage/categories/entities/category.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import {
 	Column,
@@ -19,9 +20,6 @@ export class PostEntity {
 	@Column('varchar', { length: 120 })
 	subtitle: string;
 
-	@Column('varchar', { length: 120 })
-	category: string;
-
 	@Column('text')
 	description: string;
 
@@ -33,6 +31,14 @@ export class PostEntity {
 
 	@ManyToOne((type) => UserEntity, (user) => user.posts, { eager: false })
 	user: UserEntity;
+
+	@Column('uuid')
+	categoryId: string;
+
+	@ManyToOne((type) => CategoryEntity, (category) => category.posts, {
+		eager: false,
+	})
+	category: CategoryEntity;
 
 	@CreateDateColumn({
 		type: 'timestamp',
