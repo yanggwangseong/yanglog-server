@@ -17,6 +17,9 @@ export class CategoryEntity {
 	@Column('varchar', { length: 100 })
 	category_name: string;
 
+	@Column({ type: 'int', width: 11 })
+	priority: number;
+
 	@Column({ nullable: true })
 	parentId: string;
 
