@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity';
@@ -33,6 +33,41 @@ export class CategoriesService {
 						child_category.priority = append_child.priority;
 
 						await this.categoriesRepository.save(child_category);
+					}
+				}
+			}
+		}
+		if (dto.delete) {
+			for (const data of dto.delete) {
+				const result = await this.categoriesRepository.delete({
+					id: data,
+				});
+
+				if (result.affected === 0)
+					throw new NotFoundException(
+						`Could not find category with id ${data}`,
+					);
+			}
+		}
+
+		if (dto.update) {
+			for (const data of dto.update) {
+				const category = new CategoryEntity();
+				category.category_name = data.category_name;
+				category.priority = data.priority;
+				await this.categoriesRepository.update({ id: data.id }, category);
+
+				if (data.children) {
+					for (const update_child of data.children) {
+						const child_category = new CategoryEntity();
+						child_category.parentId = update_child.parentId;
+						child_category.category_name = update_child.category_name;
+						child_category.priority = update_child.priority;
+
+						await this.categoriesRepository.update(
+							{ id: update_child.id },
+							child_category,
+						);
 					}
 				}
 			}
