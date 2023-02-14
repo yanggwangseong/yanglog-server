@@ -8,5 +8,6 @@ export const typeORMConfig: TypeOrmModuleOptions = {
 	password: 'postgres',
 	database: 'yanglog',
 	entities: [__dirname + '/../**/*.entity.{js,ts}'],
+	//logging: ['query'],
 	synchronize: true,
 };

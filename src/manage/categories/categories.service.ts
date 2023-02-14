@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -12,7 +12,19 @@ export class CategoriesService {
 		private categoriesRepository: Repository<CategoryEntity>,
 	) {}
 
-	async UpdateCategory(dto: UpdateCategoryDto) {
+	async getAllCategory(): Promise<CategoryEntity[]> {
+		return await this.categoriesRepository.find({
+			where: {
+				parentId: IsNull(),
+			},
+			relations: ['children'],
+			order: {
+				priority: 'ASC',
+			},
+		});
+	}
+
+	async UpdateCategory(dto: UpdateCategoryDto): Promise<void> {
 		//새로운 카테고리 생성
 		if (dto.append) {
 			for (const append of dto.append) {
@@ -37,6 +49,7 @@ export class CategoriesService {
 				}
 			}
 		}
+		// 카테고리 삭제
 		if (dto.delete) {
 			for (const data of dto.delete) {
 				const result = await this.categoriesRepository.delete({
@@ -49,7 +62,7 @@ export class CategoriesService {
 					);
 			}
 		}
-
+		// 카테고리 수정
 		if (dto.update) {
 			for (const data of dto.update) {
 				const category = new CategoryEntity();
@@ -72,7 +85,5 @@ export class CategoriesService {
 				}
 			}
 		}
-
-		return 'hi';
 	}
 }
