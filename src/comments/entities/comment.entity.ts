@@ -18,7 +18,7 @@ export class CommentEntity {
 	@Column('text')
 	comment_content: string;
 
-	@Column('uuid')
+	@Column('uuid', { nullable: true })
 	parentId: string;
 
 	@ManyToOne(() => CommentEntity, (comment) => comment.children_comment)

@@ -20,7 +20,7 @@ export class CategoryEntity {
 	@Column({ type: 'int', width: 11 })
 	priority: number;
 
-	@Column({ nullable: true })
+	@Column('uuid', { nullable: true })
 	parentId: string;
 
 	@ManyToOne(() => CategoryEntity, (category) => category.children)
