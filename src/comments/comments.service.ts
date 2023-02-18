@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -21,5 +22,14 @@ export class CommentsService {
 		comment.userId = userId;
 
 		await this.commentsRepository.save(comment);
+	}
+
+	async updateCommentById(
+		commentId: string,
+		dto: UpdateCommentDto,
+	): Promise<void> {
+		const comment = new CommentEntity();
+		comment.comment_content = dto.comment_content;
+		await this.commentsRepository.update({ id: commentId }, comment);
 	}
 }
