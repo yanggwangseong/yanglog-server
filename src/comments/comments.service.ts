@@ -12,7 +12,7 @@ export class CommentsService {
 		private commentsRepository: Repository<CommentEntity>,
 	) {}
 
-	async createComment(userId: string, dto: CreateCommentDto) {
+	async createComment(userId: string, dto: CreateCommentDto): Promise<void> {
 		const comment = new CommentEntity();
 		comment.id = uuidv4();
 		comment.comment_content = dto.comment_content;
