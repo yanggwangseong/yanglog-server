@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommentEntity } from './entities/comment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -31,5 +31,16 @@ export class CommentsService {
 		const comment = new CommentEntity();
 		comment.comment_content = dto.comment_content;
 		await this.commentsRepository.update({ id: commentId }, comment);
+	}
+
+	async deleteCommentById(commentId: string): Promise<void> {
+		const result = await this.commentsRepository.delete({
+			id: commentId,
+		});
+
+		if (result.affected === 0)
+			throw new NotFoundException(
+				`Could not find comment with id ${commentId}`,
+			);
 	}
 }

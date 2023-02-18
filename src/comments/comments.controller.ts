@@ -1,4 +1,12 @@
-import { Body, Controller, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Param,
+	Post,
+	Put,
+	UseGuards,
+} from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -24,5 +32,12 @@ export class CommentsController {
 		@Body() dto: UpdateCommentDto,
 	): Promise<void> {
 		this.commentsService.updateCommentById(commentId, dto);
+	}
+
+	@Delete(':commentId')
+	async deleteCommentById(
+		@Param('commentId') commentId: string,
+	): Promise<void> {
+		this.commentsService.deleteCommentById(commentId);
 	}
 }
