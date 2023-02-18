@@ -21,6 +21,7 @@ import {
 } from 'nest-winston';
 import { AuthModule } from './auth/auth.module';
 import { ManageModule } from './manage/manage.module';
+import { CommentsModule } from './comments/comments.module';
 import * as winston from 'winston';
 
 @Module({
@@ -49,6 +50,7 @@ import * as winston from 'winston';
 		PostsModule,
 		AuthModule,
 		ManageModule,
+		CommentsModule,
 	],
 	controllers: [],
 	providers: [],

@@ -1,3 +1,4 @@
+import { CommentEntity } from 'src/comments/entities/comment.entity';
 import { CategoryEntity } from 'src/manage/categories/entities/category.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import {
@@ -5,6 +6,7 @@ import {
 	CreateDateColumn,
 	Entity,
 	ManyToOne,
+	OneToMany,
 	PrimaryColumn,
 	UpdateDateColumn,
 } from 'typeorm';
@@ -39,6 +41,9 @@ export class PostEntity {
 		eager: false,
 	})
 	category: CategoryEntity;
+
+	@OneToMany(() => CommentEntity, (comment) => comment.postId)
+	comments: CommentEntity[];
 
 	@CreateDateColumn({
 		type: 'timestamp',

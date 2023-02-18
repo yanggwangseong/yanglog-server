@@ -29,7 +29,7 @@ export class CategoryEntity {
 	@OneToMany(() => CategoryEntity, (category) => category.parent)
 	children: CategoryEntity[];
 
-	@OneToMany((type) => PostEntity, (post) => post.category, { eager: true })
+	@OneToMany((type) => PostEntity, (post) => post.categoryId, { eager: true })
 	posts: PostEntity[];
 
 	@CreateDateColumn({

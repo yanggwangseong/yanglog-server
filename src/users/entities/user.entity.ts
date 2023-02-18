@@ -1,3 +1,4 @@
+import { CommentEntity } from 'src/comments/entities/comment.entity';
 import { PostEntity } from 'src/posts/entities/post.entity';
 import {
 	Column,
@@ -61,4 +62,7 @@ export class UserEntity {
 
 	@OneToMany((type) => PostEntity, (post) => post.user, { eager: true })
 	posts: PostEntity[];
+
+	@OneToMany(() => CommentEntity, (comment) => comment.userId)
+	comments: CommentEntity[];
 }

@@ -1,10 +1,4 @@
-import {
-	ArrayMinSize,
-	IsBoolean,
-	IsNumber,
-	IsString,
-	IsUUID,
-} from 'class-validator';
+import { ArrayMinSize, IsNumber, IsString } from 'class-validator';
 
 export class CategoryDTO {
 	@IsString()
