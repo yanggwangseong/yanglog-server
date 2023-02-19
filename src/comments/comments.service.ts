@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommentEntity } from './entities/comment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -12,6 +12,18 @@ export class CommentsService {
 		@InjectRepository(CommentEntity)
 		private commentsRepository: Repository<CommentEntity>,
 	) {}
+
+	async getAllCategory(): Promise<CommentEntity[]> {
+		return await this.commentsRepository.find({
+			where: {
+				parentId: IsNull(),
+			},
+			relations: ['children_comments'],
+			order: {
+				createdAt: 'ASC',
+			},
+		});
+	}
 
 	async createComment(userId: string, dto: CreateCommentDto): Promise<void> {
 		const comment = new CommentEntity();

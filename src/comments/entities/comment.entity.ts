@@ -21,11 +21,11 @@ export class CommentEntity {
 	@Column('uuid', { nullable: true })
 	parentId: string;
 
-	@ManyToOne(() => CommentEntity, (comment) => comment.children_comment)
+	@ManyToOne(() => CommentEntity, (comment) => comment.children_comments)
 	parent: CommentEntity;
 
-	@OneToMany(() => CommentEntity, (comment) => comment.parentId)
-	children_comment: CommentEntity[];
+	@OneToMany(() => CommentEntity, (comment) => comment.parent)
+	children_comments: CommentEntity[];
 
 	@Column('uuid')
 	userId: string;

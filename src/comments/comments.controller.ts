@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Delete,
+	Get,
 	Param,
 	Post,
 	Put,
@@ -12,11 +13,17 @@ import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CommentEntity } from './entities/comment.entity';
 
 @Controller('comments')
 @UseGuards(AccessTokenGuard)
 export class CommentsController {
 	constructor(private readonly commentsService: CommentsService) {}
+
+	@Get()
+	async getAllCategory(): Promise<CommentEntity[]> {
+		return this.commentsService.getAllCategory();
+	}
 
 	@Post()
 	async createComment(
