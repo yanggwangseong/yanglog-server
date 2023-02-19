@@ -20,8 +20,10 @@ import { CommentEntity } from './entities/comment.entity';
 export class CommentsController {
 	constructor(private readonly commentsService: CommentsService) {}
 
-	@Get()
-	async getAllCategory(): Promise<CommentEntity[]> {
+	@Get(':postId')
+	async getAllCategory(
+		@Param('postId') postId: string,
+	): Promise<CommentEntity[]> {
 		return this.commentsService.getAllCategory();
 	}
 

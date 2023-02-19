@@ -13,10 +13,11 @@ export class CommentsService {
 		private commentsRepository: Repository<CommentEntity>,
 	) {}
 
-	async getAllCategory(): Promise<CommentEntity[]> {
+	async getAllCategory(postId: string): Promise<CommentEntity[]> {
 		return await this.commentsRepository.find({
 			where: {
 				parentId: IsNull(),
+				postId: postId,
 			},
 			relations: ['children_comments'],
 			order: {
