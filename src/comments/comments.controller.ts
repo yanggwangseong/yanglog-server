@@ -24,7 +24,7 @@ export class CommentsController {
 	async getAllCategory(
 		@Param('postId') postId: string,
 	): Promise<CommentEntity[]> {
-		return this.commentsService.getAllCategory();
+		return this.commentsService.getAllCategory(postId);
 	}
 
 	@Post()
