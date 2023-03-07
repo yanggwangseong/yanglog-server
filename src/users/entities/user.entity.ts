@@ -60,7 +60,7 @@ export class UserEntity {
 	})
 	updatedAt: Date;
 
-	@OneToMany((type) => PostEntity, (post) => post.user, { eager: true })
+	@OneToMany((type) => PostEntity, (post) => post.user, { eager: false })
 	posts: PostEntity[];
 
 	@OneToMany(() => CommentEntity, (comment) => comment.userId)

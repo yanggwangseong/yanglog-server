@@ -19,13 +19,16 @@ export class CommentEntity {
 	comment_content: string;
 
 	@Column('uuid', { nullable: true })
-	parentId: string;
+	parentId: string; //최초 부모격인 댓글 uid
 
 	@ManyToOne(() => CommentEntity, (comment) => comment.children_comments)
 	parent: CommentEntity;
 
 	@OneToMany(() => CommentEntity, (comment) => comment.parent)
 	children_comments: CommentEntity[];
+
+	@Column('uuid', { nullable: true })
+	replyId: string; //실제 답글을 달고자 하는 댓글 uid 해당 uid로 user.name을 알아내서 parentUserName에 담음.
 
 	@Column('uuid')
 	userId: string;
