@@ -13,20 +13,18 @@ import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { CommentEntity } from './entities/comment.entity';
+import { CommentDto } from './dto/comment.dto';
 
 @Controller('comments')
-@UseGuards(AccessTokenGuard)
 export class CommentsController {
 	constructor(private readonly commentsService: CommentsService) {}
 
 	@Get(':postId')
-	async getAllComment(
-		@Param('postId') postId: string,
-	): Promise<CommentEntity[]> {
-		return this.commentsService.getAllComment(postId);
+	async getAllComments(@Param('postId') postId: string): Promise<CommentDto[]> {
+		return this.commentsService.getAllComments(postId);
 	}
 
+	@UseGuards(AccessTokenGuard)
 	@Post()
 	async createComment(
 		@CurrentUser('sub') sub: string,
@@ -35,6 +33,7 @@ export class CommentsController {
 		this.commentsService.createComment(sub, dto);
 	}
 
+	@UseGuards(AccessTokenGuard)
 	@Put(':commentId')
 	async updateCommentById(
 		@Param('commentId') commentId: string,
@@ -43,6 +42,7 @@ export class CommentsController {
 		this.commentsService.updateCommentById(commentId, dto);
 	}
 
+	@UseGuards(AccessTokenGuard)
 	@Delete(':commentId')
 	async deleteCommentById(
 		@Param('commentId') commentId: string,
