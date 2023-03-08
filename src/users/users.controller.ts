@@ -24,6 +24,7 @@ import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { refreshTokenGuard } from 'src/guards/refreshToken.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
+import { AuthResponse } from './interfaces/auth.response.interface';
 
 @Controller('users')
 export class UsersController {
@@ -66,17 +67,22 @@ export class UsersController {
 	async signin(
 		@Res({ passthrough: true }) res: Response,
 		@Body() dto: UserLoginDto,
-	): Promise<{ accessToken: string }> {
+	): Promise<AuthResponse> {
 		this.logger.error('error: ', dto);
 		const { email, password } = dto;
-		const tokens = await this.userService.signin(email, password);
-		res.cookie('Authentication', tokens.refreshToken, {
+		const response = await this.userService.signin(email, password);
+		res.cookie('Authentication', response.refreshToken, {
 			domain: 'localhost',
 			path: '/',
 			httpOnly: true,
 		});
 
-		return { accessToken: tokens.accessToken };
+		return {
+			accessToken: response.accessToken,
+			id: response.id,
+			email: response.email,
+			name: response.name,
+		};
 	}
 
 	//new

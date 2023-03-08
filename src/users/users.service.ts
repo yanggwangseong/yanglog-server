@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 
 import { Configuration, OpenAIApi } from 'openai';
+import { AuthResponse } from './interfaces/auth.response.interface';
 
 @Injectable()
 export class UsersService {
@@ -73,10 +74,7 @@ export class UsersService {
 		return tokens;
 	}
 
-	async signin(
-		email: string,
-		password: string,
-	): Promise<{ accessToken: string; refreshToken: string }> {
+	async signin(email: string, password: string): Promise<AuthResponse> {
 		const user = await this.usersRepository.findOneBy({
 			email: email,
 			password: password,
@@ -89,8 +87,15 @@ export class UsersService {
 
 		const tokens = await this.getTokens(user.id, user.name, user.role);
 		await this.updateRefreshToken(user.id, tokens.refreshToken);
-		return tokens;
+		return {
+			accessToken: tokens.accessToken,
+			refreshToken: tokens.refreshToken,
+			id: user.id,
+			name: user.name,
+			email: user.email,
+		};
 	}
+
 	async testAI() {
 		const configuration = new Configuration({
 			apiKey: process.env.OPENAI_API_KEY,
@@ -142,28 +147,30 @@ export class UsersService {
 	}
 
 	async getTokens(id: string, name: string, role: UserRole) {
-		const accessToken = await this.jwtService.signAsync(
-			{
-				sub: id,
-				username: name,
-				role: role,
-			},
-			{
-				secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-				expiresIn: '5m',
-			},
-		);
-		const refreshToken = await this.jwtService.signAsync(
-			{
-				sub: id,
-				username: name,
-				role: role,
-			},
-			{
-				secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-				expiresIn: '7d',
-			},
-		);
+		const [accessToken, refreshToken]: [string, string] = await Promise.all([
+			await this.jwtService.signAsync(
+				{
+					sub: id,
+					username: name,
+					role: role,
+				},
+				{
+					secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+					expiresIn: '5m',
+				},
+			),
+			await this.jwtService.signAsync(
+				{
+					sub: id,
+					username: name,
+					role: role,
+				},
+				{
+					secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+					expiresIn: '7d',
+				},
+			),
+		]);
 
 		return {
 			accessToken,
