@@ -19,10 +19,16 @@ export class CommentsService {
 			where: {
 				parentId: IsNull(),
 				postId: postId,
+				// children_comments: {
+				// 	comment_content: '자식댓글에댓글5',
+				// },
 			},
 			relations: ['children_comments', 'user'],
 			order: {
-				createdAt: 'ASC',
+				updatedAt: 'ASC',
+				children_comments: {
+					updatedAt: 'ASC',
+				},
 			},
 		});
 

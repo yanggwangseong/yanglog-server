@@ -28,7 +28,7 @@ import * as winston from 'winston';
 	imports: [
 		TypeOrmModule.forRoot(typeORMConfig),
 		ConfigModule.forRoot({
-			envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
+			envFilePath: [`${__dirname}/../.${process.env.NODE_ENV}.env`],
 			load: [emailConfig, authConfig],
 			isGlobal: true,
 			validationSchema,
