@@ -4,6 +4,7 @@ import { PostEntity } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreatePostDto } from './dto/create-post.dto';
+import { PostType } from './interfaces/post.interface';
 
 @Injectable()
 export class PostsService {
@@ -11,6 +12,28 @@ export class PostsService {
 		@InjectRepository(PostEntity)
 		private postsRepository: Repository<PostEntity>,
 	) {}
+
+	async getPostById(postId: string): Promise<PostType> {
+		const post = await this.postsRepository.findOne({
+			where: { id: postId },
+			relations: ['category', 'user'],
+		});
+
+		return {
+			id: post.id,
+			title: post.title,
+			subtitle: post.subtitle,
+			category: post.category.category_name,
+			img: post.imageUrn,
+			description: post.description,
+			published: post.updatedAt,
+			author: {
+				name: post.user.name,
+				img: '/images/author/profile.jpeg',
+				designation: post.user.role,
+			},
+		};
+	}
 
 	async createPost(userId: string, dto: CreatePostDto): Promise<void> {
 		const post = new PostEntity();

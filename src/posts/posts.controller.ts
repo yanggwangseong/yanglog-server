@@ -29,6 +29,11 @@ export class PostsController {
 		return await this.postsService.getMainPosts();
 	}
 
+	@Get(':postId')
+	async getPostById(@Param('postId') postId: string) {
+		return await this.postsService.getPostById(postId);
+	}
+
 	@UseGuards(AccessTokenGuard)
 	@Post()
 	async createPost(
