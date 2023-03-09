@@ -19,11 +19,13 @@ import { CommentDto } from './dto/comment.dto';
 export class CommentsController {
 	constructor(private readonly commentsService: CommentsService) {}
 
+	//posts/:postId/comments(GET)
 	@Get(':postId')
 	async getAllComments(@Param('postId') postId: string): Promise<CommentDto[]> {
 		return this.commentsService.getAllComments(postId);
 	}
 
+	//posts/:postId/comments(POST)
 	@UseGuards(AccessTokenGuard)
 	@Post()
 	async createComment(
@@ -33,6 +35,7 @@ export class CommentsController {
 		this.commentsService.createComment(sub, dto);
 	}
 
+	//posts/:postId/comments/:commentId(PUT)
 	@UseGuards(AccessTokenGuard)
 	@Put(':commentId')
 	async updateCommentById(
@@ -42,6 +45,7 @@ export class CommentsController {
 		this.commentsService.updateCommentById(commentId, dto);
 	}
 
+	//posts/:postId/comments/:commentId(DELETE)
 	@UseGuards(AccessTokenGuard)
 	@Delete(':commentId')
 	async deleteCommentById(

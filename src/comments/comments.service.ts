@@ -36,18 +36,16 @@ export class CommentsService {
 			comments.map(async (comment): Promise<CommentDto> => {
 				const newChildComments = await Promise.all(
 					comment.children_comments?.map(async (child): Promise<CommentDto> => {
-						const [replyUserName, writerName]: [string, string] =
-							await Promise.all([
-								await this.getUserNameByCommentId(child.replyId),
-								await this.getUserNameByCommentId(child.id),
-							]);
+						const [replyUserName]: [string] = await Promise.all([
+							await this.getUserNameByCommentId(child.replyId),
+						]);
 
 						return {
 							id: child.id,
 							comment_content: child.comment_content,
 							parentId: child.parentId,
 							userId: child.userId,
-							writer: writerName,
+							writer: child.user.name,
 							replyId: child.replyId,
 							replyUserName: replyUserName,
 							updatedAt: child.updatedAt,

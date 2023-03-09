@@ -28,7 +28,7 @@ export class CommentEntity {
 	children_comments: CommentEntity[];
 
 	@Column('uuid', { nullable: true })
-	replyId: string; //실제 답글을 달고자 하는 댓글 uid 해당 uid로 user.name을 알아내서 parentUserName에 담음.
+	replyId: string; //실제 답글을 달고자 하는 댓글 uid 해당 uid로 user.name을 알아내서 replyUserName 담음.
 
 	@Column('uuid')
 	userId: string;

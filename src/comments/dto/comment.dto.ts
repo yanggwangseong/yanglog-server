@@ -7,11 +7,9 @@ export class CommentDto {
 
 	userId: string;
 
-	writer?: string;
+	writer: string;
 
 	replyId?: string;
-
-	parentUserName?: string;
 
 	replyUserName?: string;
 
