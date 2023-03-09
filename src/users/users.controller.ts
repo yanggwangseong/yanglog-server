@@ -25,6 +25,7 @@ import { refreshTokenGuard } from 'src/guards/refreshToken.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
 import { AuthResponse } from './interfaces/auth.response.interface';
+import { GoogleGuard } from 'src/guards/google.guard';
 
 @Controller('users')
 export class UsersController {
@@ -144,5 +145,17 @@ export class UsersController {
 		//this.authService.verify(jwtString); AuthGuard로 대체
 
 		return await this.userService.getUserInfo(userId);
+	}
+
+	//GET(google)
+	@Get('/google/signin')
+	@UseGuards(GoogleGuard)
+	async googleAuth() {}
+
+	//GET(google/callback)
+	@Get('/google/callback')
+	@UseGuards(GoogleGuard)
+	async googleCallBackAuth(@Req() req: Request, @Res() res: Response) {
+		res.redirect('http://localhost:3000/signup');
 	}
 }
