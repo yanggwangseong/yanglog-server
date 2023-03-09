@@ -34,6 +34,10 @@ export class PostsController {
 		return await this.postsService.getPostById(postId);
 	}
 
+	//[TODO] post like
+	@Put('update-likes/:postId')
+	async updateLikesPostId() {}
+
 	@UseGuards(AccessTokenGuard)
 	@Post()
 	async createPost(
@@ -73,4 +77,9 @@ export class PostsController {
 	): Promise<void> {
 		this.commentsService.deleteCommentById(commentId);
 	}
+
+	//[TODO] comment like
+	@UseGuards(AccessTokenGuard)
+	@Put(':postId/comments/update-likes/:commentId')
+	async updateLikesCommentId() {}
 }

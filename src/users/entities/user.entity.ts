@@ -10,6 +10,8 @@ import {
 	Unique,
 	UpdateDateColumn,
 } from 'typeorm';
+import { UserLikePostEntity } from './user-like-post.entity';
+import { UserLikeCommentEntity } from './user-like-comment.entity';
 
 export enum UserRole {
 	ADMIN = 'admin',
@@ -17,7 +19,7 @@ export enum UserRole {
 	GUEST = 'guest',
 }
 
-@Entity('User')
+@Entity({ name: 'user' })
 @Unique(['email'])
 export class UserEntity {
 	@PrimaryColumn('uuid')
@@ -59,6 +61,12 @@ export class UserEntity {
 		// onUpdate: 'CURRENT_TIMESTAMP', mysql에서만 작동
 	})
 	updatedAt: Date;
+
+	@OneToMany(() => UserLikePostEntity, (ula) => ula.user)
+	userLikesPosts?: UserLikePostEntity[];
+
+	@OneToMany(() => UserLikeCommentEntity, (ula) => ula.user)
+	userLikesComments?: UserLikeCommentEntity[];
 
 	@OneToMany((type) => PostEntity, (post) => post.user, { eager: false })
 	posts: PostEntity[];

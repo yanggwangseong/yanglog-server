@@ -1,5 +1,6 @@
 import { CommentEntity } from 'src/comments/entities/comment.entity';
 import { CategoryEntity } from 'src/manage/categories/entities/category.entity';
+import { UserLikePostEntity } from 'src/users/entities/user-like-post.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import {
 	Column,
@@ -11,7 +12,7 @@ import {
 	UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('Post')
+@Entity({ name: 'post' })
 export class PostEntity {
 	@PrimaryColumn('uuid')
 	id: string;
@@ -44,6 +45,9 @@ export class PostEntity {
 
 	@OneToMany(() => CommentEntity, (comment) => comment.postId)
 	comments: CommentEntity[];
+
+	@OneToMany(() => UserLikePostEntity, (ula) => ula.post)
+	postLikedByUsers?: UserLikePostEntity[];
 
 	@CreateDateColumn({
 		type: 'timestamp',
