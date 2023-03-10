@@ -20,37 +20,37 @@ export class CommentsController {
 	constructor(private readonly commentsService: CommentsService) {}
 
 	//posts/:postId/comments(GET)
-	@Get(':postId')
-	async getAllComments(@Param('postId') postId: string): Promise<CommentDto[]> {
-		return this.commentsService.getAllComments(postId);
-	}
+	// @Get(':postId')
+	// async getAllComments(@Param('postId') postId: string): Promise<CommentDto[]> {
+	// 	return this.commentsService.getAllComments(postId);
+	// }
 
 	//posts/:postId/comments(POST)
-	@UseGuards(AccessTokenGuard)
-	@Post()
-	async createComment(
-		@CurrentUser('sub') sub: string,
-		@Body() dto: CreateCommentDto,
-	): Promise<void> {
-		this.commentsService.createComment(sub, dto);
-	}
+	// @UseGuards(AccessTokenGuard)
+	// @Post()
+	// async createComment(
+	// 	@CurrentUser('sub') sub: string,
+	// 	@Body() dto: CreateCommentDto,
+	// ): Promise<void> {
+	// 	this.commentsService.createComment(sub, dto);
+	// }
 
 	//posts/:postId/comments/:commentId(PUT)
-	@UseGuards(AccessTokenGuard)
-	@Put(':commentId')
-	async updateCommentById(
-		@Param('commentId') commentId: string,
-		@Body() dto: UpdateCommentDto,
-	): Promise<void> {
-		this.commentsService.updateCommentById(commentId, dto);
-	}
+	// @UseGuards(AccessTokenGuard)
+	// @Put(':commentId')
+	// async updateCommentById(
+	// 	@Param('commentId') commentId: string,
+	// 	@Body() dto: UpdateCommentDto,
+	// ): Promise<void> {
+	// 	this.commentsService.updateCommentById(commentId, dto);
+	// }
 
 	//posts/:postId/comments/:commentId(DELETE)
-	@UseGuards(AccessTokenGuard)
-	@Delete(':commentId')
-	async deleteCommentById(
-		@Param('commentId') commentId: string,
-	): Promise<void> {
-		this.commentsService.deleteCommentById(commentId);
-	}
+	// @UseGuards(AccessTokenGuard)
+	// @Delete(':commentId')
+	// async deleteCommentById(
+	// 	@Param('commentId') commentId: string,
+	// ): Promise<void> {
+	// 	this.commentsService.deleteCommentById(commentId);
+	// }
 }
