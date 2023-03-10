@@ -6,12 +6,15 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CommentDto } from './dto/comment.dto';
+import { UserLikeCommentEntity } from 'src/users/entities/user-like-comment.entity';
 
 @Injectable()
 export class CommentsService {
 	constructor(
 		@InjectRepository(CommentEntity)
 		private commentsRepository: Repository<CommentEntity>,
+		@InjectRepository(UserLikeCommentEntity)
+		private userLikeCommentsRepository: Repository<UserLikeCommentEntity>,
 	) {}
 
 	async getAllComments(postId: string): Promise<CommentDto[]> {
@@ -108,5 +111,18 @@ export class CommentsService {
 			throw new NotFoundException(
 				`Could not find comment with id ${commentId}`,
 			);
+	}
+
+	async updateLikesCommentId(userId: string, commentId: string) {
+		const like = await this.userLikeCommentsRepository.findOneBy({
+			userId,
+			commentId,
+		});
+		if (like) {
+			await this.userLikeCommentsRepository.remove(like);
+		} else {
+			await this.userLikeCommentsRepository.save({ userId, commentId });
+		}
+		return !like;
 	}
 }
