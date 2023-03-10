@@ -5,12 +5,15 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostType } from './interfaces/post.interface';
+import { UserLikePostEntity } from 'src/users/entities/user-like-post.entity';
 
 @Injectable()
 export class PostsService {
 	constructor(
 		@InjectRepository(PostEntity)
 		private postsRepository: Repository<PostEntity>,
+		@InjectRepository(UserLikePostEntity)
+		private userLikePostsRepository: Repository<UserLikePostEntity>,
 	) {}
 
 	async getPostById(postId: string): Promise<PostType> {
@@ -45,6 +48,19 @@ export class PostsService {
 		post.userId = userId;
 
 		await this.postsRepository.save(post);
+	}
+
+	async updateLikesPostId(userId: string, postId: string) {
+		const like = await this.userLikePostsRepository.findOneBy({
+			userId,
+			postId,
+		});
+		if (like) {
+			await this.userLikePostsRepository.remove(like);
+		} else {
+			await this.userLikePostsRepository.save({ userId, postId });
+		}
+		return !like;
 	}
 
 	async getMainPosts() {

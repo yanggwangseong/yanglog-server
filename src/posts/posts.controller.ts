@@ -35,8 +35,14 @@ export class PostsController {
 	}
 
 	//[TODO] post like
-	@Put('update-likes/:postId')
-	async updateLikesPostId() {}
+	@UseGuards(AccessTokenGuard)
+	@Put(':postId/likes')
+	async updateLikesPostId(
+		@CurrentUser('sub') sub: string,
+		@Param('postId') postId: string,
+	) {
+		return await this.postsService.updateLikesPostId(sub, postId);
+	}
 
 	@UseGuards(AccessTokenGuard)
 	@Post()
@@ -80,6 +86,11 @@ export class PostsController {
 
 	//[TODO] comment like
 	@UseGuards(AccessTokenGuard)
-	@Put(':postId/comments/update-likes/:commentId')
-	async updateLikesCommentId() {}
+	@Put(':postId/comments/:commentId/likes')
+	async updateLikesCommentId(
+		@CurrentUser('sub') sub: string,
+		@Param('commentId') commentId: string,
+	) {
+		return await this.commentsService.updateLikesCommentId(sub, commentId);
+	}
 }
