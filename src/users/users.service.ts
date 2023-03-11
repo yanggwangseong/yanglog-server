@@ -4,6 +4,7 @@ import {
 	Injectable,
 	InternalServerErrorException,
 	NotFoundException,
+	UnauthorizedException,
 	UnprocessableEntityException,
 } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
@@ -32,6 +33,21 @@ export class UsersService {
 		private jwtService: JwtService,
 		private configService: ConfigService,
 	) {}
+
+	async verifyAccessToken(token: string): Promise<string> {
+		try {
+			const { sub }: { sub: string } = await this.jwtService.verifyAsync(
+				token,
+				{
+					secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+				},
+			);
+
+			return sub;
+		} catch (error) {
+			throw new UnauthorizedException('Invalid token');
+		}
+	}
 
 	async createUser(name: string, email: string, password: string) {
 		const userExist = await this.checkUserExists(email);

@@ -7,6 +7,7 @@ import {
 	Param,
 	Put,
 	Delete,
+	Req,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -16,12 +17,15 @@ import { CommentsService } from 'src/comments/comments.service';
 import { CommentDto } from 'src/comments/dto/comment.dto';
 import { CreateCommentDto } from 'src/comments/dto/create-comment.dto';
 import { UpdateCommentDto } from 'src/comments/dto/update-comment.dto';
+import { Request } from 'express';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('posts')
 export class PostsController {
 	constructor(
 		private readonly postsService: PostsService,
 		private readonly commentsService: CommentsService,
+		private readonly usersService: UsersService,
 	) {}
 
 	@Get('main')
@@ -30,11 +34,17 @@ export class PostsController {
 	}
 
 	@Get(':postId')
-	async getPostById(@Param('postId') postId: string) {
+	async getPostById(@Param('postId') postId: string, @Req() req: Request) {
+		const authorizationHeader = req.headers['authorization'];
+		if (authorizationHeader) {
+			const [, token] = authorizationHeader.split(' ');
+			const sub = await this.usersService.verifyAccessToken(token);
+			return await this.postsService.getPostById(postId, sub);
+		}
+
 		return await this.postsService.getPostById(postId);
 	}
 
-	//[TODO] post like
 	@UseGuards(AccessTokenGuard)
 	@Put(':postId/likes')
 	async updateLikesPostId(
@@ -84,7 +94,6 @@ export class PostsController {
 		this.commentsService.deleteCommentById(commentId);
 	}
 
-	//[TODO] comment like
 	@UseGuards(AccessTokenGuard)
 	@Put(':postId/comments/:commentId/likes')
 	async updateLikesCommentId(
