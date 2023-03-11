@@ -1,4 +1,6 @@
 import {
+	BaseEntity,
+	Column,
 	CreateDateColumn,
 	Entity,
 	JoinColumn,
@@ -17,7 +19,10 @@ export class UserLikeCommentEntity {
 	@PrimaryColumn('uuid')
 	public readonly commentId!: string;
 
-	@ManyToOne((type) => UserEntity, (user) => user.userLikesPosts)
+	@Column({ default: 0 })
+	value: number;
+
+	@ManyToOne((type) => UserEntity, (user) => user.userLikesComments)
 	@JoinColumn({ name: 'userId', referencedColumnName: 'id' })
 	user!: UserEntity;
 

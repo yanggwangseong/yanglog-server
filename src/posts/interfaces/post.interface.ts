@@ -7,6 +7,7 @@ export interface PostType {
 	description: string;
 	published: Date;
 	author: ProfileType;
+	likes?: number;
 }
 
 export interface ProfileType {

@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import { CommentEntity } from 'src/comments/entities/comment.entity';
 import { CategoryEntity } from 'src/manage/categories/entities/category.entity';
 import { UserLikePostEntity } from 'src/users/entities/user-like-post.entity';
@@ -62,6 +63,22 @@ export class PostEntity {
 		default: () => 'CURRENT_TIMESTAMP',
 	})
 	updatedAt: Date;
+
+	protected userLike: number;
+
+	setUserLike(userId: string) {
+		const index = this.postLikedByUsers?.findIndex((v) => v.userId === userId);
+		this.userLike = index > -1 ? 1 : 0;
+	}
+
+	@Expose() get totalLikes(): number {
+		const initalValue = 0;
+		return this.postLikedByUsers?.reduce(
+			(previousValue, currentObject) =>
+				previousValue + (currentObject.postId ? 1 : 0),
+			initalValue,
+		);
+	}
 
 	/*
 	postId: 5,

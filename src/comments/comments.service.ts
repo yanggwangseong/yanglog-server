@@ -26,7 +26,7 @@ export class CommentsService {
 				// 	comment_content: '자식댓글에댓글5',
 				// },
 			},
-			relations: ['children_comments', 'user'],
+			relations: ['children_comments', 'user', 'commentLikedByUsers'],
 			order: {
 				updatedAt: 'ASC',
 				children_comments: {
@@ -35,12 +35,23 @@ export class CommentsService {
 			},
 		});
 
+		//comments.forEach((c) => c.setUserLike(c.userId));
+
+		//TODO comment.entity에 userId를 이용하여 본인이 vote값 1또는 -1을 담는 객체 userVote에 담는다.
 		const newComments = await Promise.all(
 			comments.map(async (comment): Promise<CommentDto> => {
 				const newChildComments = await Promise.all(
 					comment.children_comments?.map(async (child): Promise<CommentDto> => {
-						const [replyUserName]: [string] = await Promise.all([
+						const [replyUserName, writeUserName, likes]: [
+							string,
+							string,
+							number,
+						] = await Promise.all([
 							await this.getUserNameByCommentId(child.replyId),
+							await this.getUserNameByCommentId(child.id),
+							await this.userLikeCommentsRepository.count({
+								where: { commentId: child.id },
+							}),
 						]);
 
 						return {
@@ -48,7 +59,8 @@ export class CommentsService {
 							comment_content: child.comment_content,
 							parentId: child.parentId,
 							userId: child.userId,
-							writer: child.user.name,
+							writer: writeUserName,
+							likes: likes ? likes : 0,
 							replyId: child.replyId,
 							replyUserName: replyUserName,
 							updatedAt: child.updatedAt,
@@ -62,6 +74,7 @@ export class CommentsService {
 					children_comments: newChildComments,
 					userId: comment.userId,
 					writer: comment.user.name,
+					likes: comment.totalLikes,
 					updatedAt: comment.updatedAt,
 				};
 			}),
@@ -72,6 +85,11 @@ export class CommentsService {
 
 	async getUserNameByCommentId(commentId: string) {
 		const comment = await this.commentsRepository.findOne({
+			select: {
+				user: {
+					name: true,
+				},
+			},
 			where: {
 				id: commentId,
 			},

@@ -1,3 +1,4 @@
+import { Exclude, Expose, instanceToPlain } from 'class-transformer';
 import { PostEntity } from 'src/posts/entities/post.entity';
 import { UserLikeCommentEntity } from 'src/users/entities/user-like-comment.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
@@ -34,17 +35,18 @@ export class CommentEntity {
 	@Column('uuid')
 	userId: string;
 
-	@ManyToOne(() => UserEntity, (user) => user.comments, { eager: false })
+	@ManyToOne(() => UserEntity, (user) => user.comments)
 	user: UserEntity;
 
 	@Column('uuid')
 	postId: string;
 
-	@ManyToOne(() => PostEntity, (post) => post.comments, { eager: false })
+	@ManyToOne(() => PostEntity, (post) => post.comments)
 	post: PostEntity;
 
+	@Exclude()
 	@OneToMany(() => UserLikeCommentEntity, (ula) => ula.comment)
-	commentLikedByUsers?: UserLikeCommentEntity[];
+	commentLikedByUsers: UserLikeCommentEntity[];
 
 	@CreateDateColumn({
 		type: 'timestamp',
@@ -60,4 +62,22 @@ export class CommentEntity {
 		// onUpdate: 'CURRENT_TIMESTAMP', mysql에서만 작동
 	})
 	updatedAt: Date;
+
+	protected userLike: number;
+
+	setUserLike(userId: string) {
+		const index = this.commentLikedByUsers?.findIndex(
+			(v) => v.userId === userId,
+		);
+		this.userLike = index > -1 ? this.commentLikedByUsers[index].value : 0;
+	}
+
+	@Expose() get totalLikes(): number {
+		const initalValue = 0;
+		return this.commentLikedByUsers?.reduce(
+			(previousValue, currentObject) =>
+				previousValue + (currentObject.value || 0),
+			initalValue,
+		);
+	}
 }

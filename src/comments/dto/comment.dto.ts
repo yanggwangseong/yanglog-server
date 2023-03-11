@@ -11,6 +11,8 @@ export class CommentDto {
 
 	replyId?: string;
 
+	likes: number;
+
 	replyUserName?: string;
 
 	updatedAt: Date;

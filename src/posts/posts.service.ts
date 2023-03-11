@@ -16,11 +16,36 @@ export class PostsService {
 		private userLikePostsRepository: Repository<UserLikePostEntity>,
 	) {}
 
-	async getPostById(postId: string): Promise<PostType> {
-		const post = await this.postsRepository.findOne({
-			where: { id: postId },
-			relations: ['category', 'user'],
-		});
+	async getPostById(postId: string, userId?: string): Promise<PostType> {
+		const [post, likes] = await Promise.all([
+			await this.postsRepository.findOne({
+				select: {
+					id: true,
+					title: true,
+					subtitle: true,
+					imageUrn: true,
+					description: true,
+					updatedAt: true,
+					category: {
+						category_name: true,
+					},
+					user: {
+						name: true,
+						role: true,
+					},
+				},
+				where: { id: postId },
+				relations: ['category', 'user', 'postLikedByUsers'],
+			}),
+
+			await this.userLikePostsRepository.count({
+				where: { postId: postId },
+			}),
+		]);
+
+		if (userId) {
+			post.setUserLike(userId);
+		}
 
 		return {
 			id: post.id,
@@ -35,6 +60,7 @@ export class PostsService {
 				img: '/images/author/profile.jpeg',
 				designation: post.user.role,
 			},
+			likes: likes,
 		};
 	}
 
