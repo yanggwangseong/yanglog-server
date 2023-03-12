@@ -17,31 +17,25 @@ export class PostsService {
 	) {}
 
 	async getPostById(postId: string, userId?: string): Promise<PostType> {
-		const [post, likes] = await Promise.all([
-			await this.postsRepository.findOne({
-				select: {
-					id: true,
-					title: true,
-					subtitle: true,
-					imageUrn: true,
-					description: true,
-					updatedAt: true,
-					category: {
-						category_name: true,
-					},
-					user: {
-						name: true,
-						role: true,
-					},
+		const post = await this.postsRepository.findOne({
+			select: {
+				id: true,
+				title: true,
+				subtitle: true,
+				imageUrn: true,
+				description: true,
+				updatedAt: true,
+				category: {
+					category_name: true,
 				},
-				where: { id: postId },
-				relations: ['category', 'user', 'postLikedByUsers'],
-			}),
-
-			await this.userLikePostsRepository.count({
-				where: { postId: postId },
-			}),
-		]);
+				user: {
+					name: true,
+					role: true,
+				},
+			},
+			where: { id: postId },
+			relations: ['category', 'user', 'postLikedByUsers'],
+		});
 
 		if (userId) {
 			post.setUserLike(userId);
@@ -60,7 +54,8 @@ export class PostsService {
 				img: '/images/author/profile.jpeg',
 				designation: post.user.role,
 			},
-			likes: likes,
+			likes: post.totalLikes,
+			mylike: post.myLike,
 		};
 	}
 

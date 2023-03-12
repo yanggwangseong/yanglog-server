@@ -71,6 +71,10 @@ export class PostEntity {
 		this.userLike = index > -1 ? 1 : 0;
 	}
 
+	@Expose() get myLike(): number {
+		return this.userLike;
+	}
+
 	@Expose() get totalLikes(): number {
 		const initalValue = 0;
 		return this.postLikedByUsers?.reduce(
