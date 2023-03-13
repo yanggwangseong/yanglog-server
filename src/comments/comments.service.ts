@@ -46,9 +46,11 @@ export class CommentsService {
 						const [replyUserName, writeUserName, likes] = await Promise.all([
 							await this.getUserNameByCommentId(child.replyId),
 							await this.getUserNameByCommentId(child.id),
-							await this.userLikeCommentsRepository.count({
-								where: { commentId: child.id },
-							}),
+							this.userLikeCommentsRepository
+								.createQueryBuilder('ula')
+								.select('SUM(ula.value)', 'TotalLike')
+								.where('ula.commentId = :commentId', { commentId: child.id })
+								.getRawOne(),
 						]);
 
 						let value: number;
@@ -62,7 +64,7 @@ export class CommentsService {
 							parentId: child.parentId,
 							userId: child.userId,
 							writer: writeUserName,
-							likes: likes ? likes : 0,
+							likes: likes.TotalLike ? likes.TotalLike : 0,
 							mylike: value,
 							replyId: child.replyId,
 							replyUserName: replyUserName,
