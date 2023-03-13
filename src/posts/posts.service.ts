@@ -60,30 +60,45 @@ export class PostsService {
 	}
 
 	async searchPosts(keyword: string, option: string, sort: string) {
-		const [list, count] = await this.postsRepository.findAndCount({
-			select: {
-				id: true,
-				title: true,
-				subtitle: true,
-				imageUrn: true,
-				description: true,
-				updatedAt: true,
-				category: {
-					category_name: true,
-				},
-				user: {
-					name: true,
-					role: true,
-				},
-			},
-			where: {
-				title: Like(`%${keyword}%`),
-			},
-			relations: ['category', 'user', 'postLikedByUsers'],
-		});
+		let query = this.postsRepository
+			.createQueryBuilder('a')
+			.select([
+				'a.id AS "id"',
+				'a.title AS "title"',
+				'a.subtitle AS "subtitle"',
+				'category.category_name AS "category_name"',
+				'a.imageUrn AS "img"',
+				'a.description AS "description"',
+				'a.updatedAt AS "published"',
+				'user.name AS "name"',
+				'user.role AS "role"',
+			])
+			.leftJoin('a.category', 'category')
+			.leftJoin('a.user', 'user')
+			.where('a.title LIKE :keyword', { keyword: `%${keyword}%` })
+			.orderBy('a.updatedAt', 'ASC');
 
+		const [list, count] = await Promise.all([
+			query.getRawMany(),
+			query.getCount(),
+		]);
 		return {
-			list,
+			list: list.map((post) => {
+				return {
+					id: post.id,
+					title: post.title,
+					subtitle: post.subtitle,
+					category: post.category_name,
+					img: post.img,
+					description: post.description,
+					published: post.published,
+					author: {
+						name: post.name,
+						img: '/images/author/profile.jpeg',
+						designation: post.role,
+					},
+				};
+			}),
 			count,
 		};
 	}
