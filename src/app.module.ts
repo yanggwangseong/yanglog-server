@@ -22,6 +22,7 @@ import {
 import { AuthModule } from './auth/auth.module';
 import { ManageModule } from './manage/manage.module';
 import { CommentsModule } from './comments/comments.module';
+import { SearchService } from './search/search.service';
 import * as winston from 'winston';
 
 @Module({
@@ -53,7 +54,7 @@ import * as winston from 'winston';
 		CommentsModule,
 	],
 	controllers: [],
-	providers: [],
+	providers: [SearchService],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer): any {

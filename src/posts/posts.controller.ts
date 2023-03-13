@@ -8,6 +8,7 @@ import {
 	Put,
 	Delete,
 	Req,
+	Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -31,6 +32,20 @@ export class PostsController {
 	@Get('main')
 	async getMainPosts() {
 		return await this.postsService.getMainPosts();
+	}
+
+	@Get('search')
+	async searchPosts(
+		@Query('keyword') keyword: string,
+		@Query('option') option: string,
+		@Query('sort') sort: string,
+	) {
+		const searchResults = await this.postsService.searchPosts(
+			keyword,
+			option,
+			sort,
+		);
+		return searchResults;
 	}
 
 	@Get(':postId')

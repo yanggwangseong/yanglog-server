@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostType } from './interfaces/post.interface';
@@ -56,6 +56,35 @@ export class PostsService {
 			},
 			likes: post.totalLikes,
 			mylike: post.myLike,
+		};
+	}
+
+	async searchPosts(keyword: string, option: string, sort: string) {
+		const [list, count] = await this.postsRepository.findAndCount({
+			select: {
+				id: true,
+				title: true,
+				subtitle: true,
+				imageUrn: true,
+				description: true,
+				updatedAt: true,
+				category: {
+					category_name: true,
+				},
+				user: {
+					name: true,
+					role: true,
+				},
+			},
+			where: {
+				title: Like(`%${keyword}%`),
+			},
+			relations: ['category', 'user', 'postLikedByUsers'],
+		});
+
+		return {
+			list,
+			count,
 		};
 	}
 
