@@ -151,8 +151,12 @@ export class CommentsService {
 			commentId,
 		});
 
-		await this.userLikeCommentsRepository.save({ userId, commentId, value });
+		const newlike = await this.userLikeCommentsRepository.save({
+			userId,
+			commentId,
+			value,
+		});
 
-		return !like;
+		return newlike.value === 1 ? true : false;
 	}
 }
