@@ -100,7 +100,6 @@ export class PostsService {
 		};
 	}
 
-	// TODO[get-trending]
 	async getTrendingPosts() {
 		const trending = await this.postsRepository.find({
 			relations: ['category', 'user'],
@@ -129,7 +128,6 @@ export class PostsService {
 		});
 	}
 
-	// TODO[get-posts]
 	async getPosts() {
 		const posts = await this.postsRepository.find({
 			relations: ['category', 'user'],
@@ -155,7 +153,6 @@ export class PostsService {
 		});
 	}
 
-	// TODO[get-popular]
 	async getPopular() {
 		const populars = await this.postsRepository.find({
 			relations: ['category', 'user'],
@@ -181,7 +178,6 @@ export class PostsService {
 		});
 	}
 
-	// TODO[get-chatgpt-posts]
 	async getChatgptPosts() {
 		const gptPosts = await this.postsRepository.find({
 			relations: ['category', 'user'],

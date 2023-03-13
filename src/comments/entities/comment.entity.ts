@@ -72,6 +72,10 @@ export class CommentEntity {
 		this.userLike = index > -1 ? this.commentLikedByUsers[index].value : 0;
 	}
 
+	@Expose() get myLike(): number {
+		return this.userLike;
+	}
+
 	@Expose() get totalLikes(): number {
 		const initalValue = 0;
 		return this.commentLikedByUsers?.reduce(

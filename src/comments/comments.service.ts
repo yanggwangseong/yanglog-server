@@ -17,7 +17,7 @@ export class CommentsService {
 		private userLikeCommentsRepository: Repository<UserLikeCommentEntity>,
 	) {}
 
-	async getAllComments(postId: string): Promise<CommentDto[]> {
+	async getAllComments(postId: string, userId?: string): Promise<CommentDto[]> {
 		const comments = await this.commentsRepository.find({
 			where: {
 				parentId: IsNull(),
@@ -35,24 +35,26 @@ export class CommentsService {
 			},
 		});
 
-		//comments.forEach((c) => c.setUserLike(c.userId));
+		if (userId) {
+			comments.forEach((c) => c.setUserLike(userId));
+		}
 
-		//TODO comment.entity에 userId를 이용하여 본인이 vote값 1또는 -1을 담는 객체 userVote에 담는다.
 		const newComments = await Promise.all(
 			comments.map(async (comment): Promise<CommentDto> => {
 				const newChildComments = await Promise.all(
 					comment.children_comments?.map(async (child): Promise<CommentDto> => {
-						const [replyUserName, writeUserName, likes]: [
-							string,
-							string,
-							number,
-						] = await Promise.all([
+						const [replyUserName, writeUserName, likes] = await Promise.all([
 							await this.getUserNameByCommentId(child.replyId),
 							await this.getUserNameByCommentId(child.id),
 							await this.userLikeCommentsRepository.count({
 								where: { commentId: child.id },
 							}),
 						]);
+
+						let value: number;
+						if (userId) {
+							value = await this.getUserLikeCommentValue(userId, child.id);
+						}
 
 						return {
 							id: child.id,
@@ -61,6 +63,7 @@ export class CommentsService {
 							userId: child.userId,
 							writer: writeUserName,
 							likes: likes ? likes : 0,
+							mylike: value,
 							replyId: child.replyId,
 							replyUserName: replyUserName,
 							updatedAt: child.updatedAt,
@@ -75,6 +78,7 @@ export class CommentsService {
 					userId: comment.userId,
 					writer: comment.user.name,
 					likes: comment.totalLikes,
+					mylike: comment.myLike,
 					updatedAt: comment.updatedAt,
 				};
 			}),
@@ -83,7 +87,7 @@ export class CommentsService {
 		return newComments;
 	}
 
-	async getUserNameByCommentId(commentId: string) {
+	private async getUserNameByCommentId(commentId: string) {
 		const comment = await this.commentsRepository.findOne({
 			select: {
 				user: {
@@ -97,6 +101,14 @@ export class CommentsService {
 		});
 
 		return comment.user.name;
+	}
+
+	private async getUserLikeCommentValue(userId: string, commentId: string) {
+		const value = await this.userLikeCommentsRepository.findOne({
+			where: { userId: userId, commentId: commentId },
+		});
+
+		return value ? value.value : 0;
 	}
 
 	async createComment(userId: string, dto: CreateCommentDto): Promise<void> {
@@ -131,16 +143,14 @@ export class CommentsService {
 			);
 	}
 
-	async updateLikesCommentId(userId: string, commentId: string) {
+	async updateLikesCommentId(userId: string, commentId: string, value: number) {
 		const like = await this.userLikeCommentsRepository.findOneBy({
 			userId,
 			commentId,
 		});
-		if (like) {
-			await this.userLikeCommentsRepository.remove(like);
-		} else {
-			await this.userLikeCommentsRepository.save({ userId, commentId });
-		}
+
+		await this.userLikeCommentsRepository.save({ userId, commentId, value });
+
 		return !like;
 	}
 }

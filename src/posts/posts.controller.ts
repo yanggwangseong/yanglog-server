@@ -64,7 +64,17 @@ export class PostsController {
 	}
 
 	@Get(':postId/comments')
-	async getAllComments(@Param('postId') postId: string): Promise<CommentDto[]> {
+	async getAllComments(
+		@Param('postId') postId: string,
+		@Req() req: Request,
+	): Promise<CommentDto[]> {
+		const authorizationHeader = req.headers['authorization'];
+		if (authorizationHeader) {
+			const [, token] = authorizationHeader.split(' ');
+			const sub = await this.usersService.verifyAccessToken(token);
+			return await this.commentsService.getAllComments(postId, sub);
+		}
+
 		return await this.commentsService.getAllComments(postId);
 	}
 
@@ -99,7 +109,12 @@ export class PostsController {
 	async updateLikesCommentId(
 		@CurrentUser('sub') sub: string,
 		@Param('commentId') commentId: string,
+		@Body('value') value: number,
 	) {
-		return await this.commentsService.updateLikesCommentId(sub, commentId);
+		return await this.commentsService.updateLikesCommentId(
+			sub,
+			commentId,
+			value,
+		);
 	}
 }
