@@ -175,9 +175,7 @@ export class UsersController {
 			);
 		} else {
 			const response = await this.userService.CreateGoogleUser(email, fullName);
-			res.redirect(
-				'http://localhost:3000/signup/social?id=26a5a1a2-a097-4349-a59c-6ad6b53ea2ae',
-			);
+			res.redirect(`http://localhost:3000/signup/social?id=${response.userId}`);
 		}
 	}
 }

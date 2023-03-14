@@ -84,16 +84,8 @@ export class UsersService {
 
 		const createUser = await this.usersRepository.save(user);
 
-		const tokens = await this.getTokens(
-			createUser.id,
-			createUser.name,
-			createUser.role,
-		);
-		await this.updateRefreshToken(createUser.id, tokens.refreshToken);
-
 		return {
-			accessToken: tokens.accessToken,
-			refreshToken: tokens.refreshToken,
+			userId: createUser.id,
 		};
 	}
 	async signInGoogleUser(email: string) {
