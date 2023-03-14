@@ -155,6 +155,29 @@ export class UsersController {
 	@Get('/google/callback')
 	@UseGuards(GoogleGuard)
 	async googleCallBackAuth(@Req() req: Request, @Res() res: Response) {
-		res.redirect('http://localhost:3000/signup');
+		const email: string = req.user['email'];
+		const photo: string = req.user['photo'];
+		const firstName: string = req.user['firstName'];
+		const lastName: string = req.user['lastName'];
+
+		const fullName = firstName + lastName;
+		const Exist = await this.userService.checkUserExists(email);
+		if (Exist) {
+			const response = await this.userService.signInGoogleUser(email);
+
+			res.cookie('Authentication', response.refreshToken, {
+				domain: 'localhost',
+				path: '/',
+				httpOnly: true,
+			});
+			res.redirect(
+				`http://localhost:3000/oauth2/redirect?token=${response.accessToken}`,
+			);
+		} else {
+			const response = await this.userService.CreateGoogleUser(email, fullName);
+			res.redirect(
+				'http://localhost:3000/signup/social?id=26a5a1a2-a097-4349-a59c-6ad6b53ea2ae',
+			);
+		}
 	}
 }

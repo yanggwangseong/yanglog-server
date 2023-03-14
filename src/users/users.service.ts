@@ -70,6 +70,48 @@ export class UsersService {
 		}
 	}
 
+	async CreateGoogleUser(email: string, name: string) {
+		const signupVerifyToken = uuid.v1();
+		const password = uuid.v4();
+
+		const user = new UserEntity();
+		user.id = uuidv4();
+		user.name = name;
+		user.email = email;
+		user.password = password;
+		user.signupVerifyToken = signupVerifyToken;
+		user.refreshToken = '';
+
+		const createUser = await this.usersRepository.save(user);
+
+		const tokens = await this.getTokens(
+			createUser.id,
+			createUser.name,
+			createUser.role,
+		);
+		await this.updateRefreshToken(createUser.id, tokens.refreshToken);
+
+		return {
+			accessToken: tokens.accessToken,
+			refreshToken: tokens.refreshToken,
+		};
+	}
+	async signInGoogleUser(email: string) {
+		const user = await this.usersRepository.findOne({
+			where: {
+				email: email,
+			},
+		});
+
+		const tokens = await this.getTokens(user.id, user.name, user.role);
+		await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+		return {
+			accessToken: tokens.accessToken,
+			refreshToken: tokens.refreshToken,
+		};
+	}
+
 	async verifyEmail(
 		signupVerifyToken: string,
 	): Promise<{ accessToken: string; refreshToken: string }> {
@@ -232,7 +274,7 @@ export class UsersService {
 		};
 	}
 
-	private async checkUserExists(emailAddress: string): Promise<boolean> {
+	async checkUserExists(emailAddress: string): Promise<boolean> {
 		const user = await this.usersRepository.findOneBy({ email: emailAddress });
 
 		return user !== null;
