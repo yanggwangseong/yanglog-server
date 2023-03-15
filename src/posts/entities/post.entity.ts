@@ -16,55 +16,55 @@ import {
 @Entity({ name: 'post' })
 export class PostEntity {
 	@PrimaryColumn('uuid')
-	id: string;
+	id!: string;
 
 	@Column('varchar', { length: 120 })
-	title: string;
+	title!: string;
 
 	@Column('varchar', { length: 120 })
-	subtitle: string;
+	subtitle!: string;
 
 	@Column('text')
-	description: string;
+	description!: string;
 
 	@Column('varchar', { length: 120, nullable: true })
-	imageUrn: string | null;
+	imageUrn?: string | null;
 
 	@Column('uuid')
-	userId: string;
+	userId!: string;
 
 	@ManyToOne((type) => UserEntity, (user) => user.posts, { eager: false })
-	user: UserEntity;
+	user!: UserEntity;
 
 	@Column('uuid')
-	categoryId: string;
+	categoryId!: string;
 
 	@ManyToOne((type) => CategoryEntity, (category) => category.posts, {
 		eager: false,
 	})
-	category: CategoryEntity;
+	category!: CategoryEntity;
 
 	@OneToMany(() => CommentEntity, (comment) => comment.postId)
-	comments: CommentEntity[];
+	comments?: CommentEntity[];
 
 	@OneToMany(() => UserLikePostEntity, (ula) => ula.post)
-	postLikedByUsers?: UserLikePostEntity[];
+	postLikedByUsers!: UserLikePostEntity[];
 
 	@CreateDateColumn({
 		type: 'timestamp',
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	createdAt: Date;
+	createdAt!: Date;
 
 	@UpdateDateColumn({
 		type: 'timestamp',
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	updatedAt: Date;
+	updatedAt!: Date;
 
-	protected userLike: number;
+	protected userLike!: number;
 
 	setUserLike(userId: string) {
 		const index = this.postLikedByUsers?.findIndex((v) => v.userId === userId);

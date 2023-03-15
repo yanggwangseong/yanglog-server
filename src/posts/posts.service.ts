@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from './entities/post.entity';
 import { Like, Repository } from 'typeorm';
@@ -37,6 +37,8 @@ export class PostsService {
 			relations: ['category', 'user', 'postLikedByUsers'],
 		});
 
+		if (!post) throw new NotFoundException(`포스트가 존재하지 않습니다.`);
+
 		if (userId) {
 			post.setUserLike(userId);
 		}
@@ -46,7 +48,7 @@ export class PostsService {
 			title: post.title,
 			subtitle: post.subtitle,
 			category: post.category.category_name,
-			img: post.imageUrn,
+			img: post.imageUrn ? post.imageUrn : '',
 			description: post.description,
 			published: post.updatedAt,
 			author: {
