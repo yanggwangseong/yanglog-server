@@ -12,37 +12,37 @@ import {
 @Entity({ name: 'category' })
 export class CategoryEntity {
 	@PrimaryColumn('uuid')
-	id: string;
+	id!: string;
 
 	@Column('varchar', { length: 100 })
-	category_name: string;
+	category_name!: string;
 
 	@Column({ type: 'int', width: 11 })
-	priority: number;
+	priority!: number;
 
 	@Column('uuid', { nullable: true })
-	parentId: string;
+	parentId?: string;
 
 	@ManyToOne(() => CategoryEntity, (category) => category.children)
-	parent: CategoryEntity;
+	parent!: CategoryEntity;
 
 	@OneToMany(() => CategoryEntity, (category) => category.parent)
-	children: CategoryEntity[];
+	children!: CategoryEntity[];
 
 	@OneToMany(() => PostEntity, (post) => post.category)
-	posts: PostEntity[];
+	posts!: PostEntity[];
 
 	@CreateDateColumn({
 		type: 'timestamp',
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	createdAt: Date;
+	createdAt!: Date;
 
 	@UpdateDateColumn({
 		type: 'timestamp',
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	updatedAt: Date;
+	updatedAt!: Date;
 }

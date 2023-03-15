@@ -3,12 +3,12 @@ import { CategoryDTO } from './category.dto';
 
 export class UpdateCategoryDto {
 	@ArrayMinSize(0)
-	append: CategoryDTO[];
+	append!: CategoryDTO[];
 
 	@ArrayMinSize(0)
 	@IsUUID(4, { each: true })
-	delete: string[];
+	delete!: string[];
 
 	@ArrayMinSize(0)
-	update: CategoryDTO[];
+	update!: CategoryDTO[];
 }

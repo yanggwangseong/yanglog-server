@@ -31,7 +31,7 @@ export class CategoriesService {
 				const category = new CategoryEntity();
 				category.id = uuidv4();
 				category.category_name = append.category_name;
-				category.parentId = null;
+				category.parentId = undefined;
 				category.priority = append.priority;
 
 				await this.categoriesRepository.save(category);

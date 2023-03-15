@@ -15,45 +15,45 @@ import {
 @Entity({ name: 'comment' })
 export class CommentEntity {
 	@PrimaryColumn('uuid')
-	id: string;
+	id!: string;
 
 	@Column('text')
-	comment_content: string;
+	comment_content!: string;
 
 	@Column('uuid', { nullable: true })
-	parentId: string; //최초 부모격인 댓글 uid
+	parentId?: string; //최초 부모격인 댓글 uid
 
 	@ManyToOne(() => CommentEntity, (comment) => comment.children_comments)
-	parent: CommentEntity;
+	parent?: CommentEntity;
 
 	@OneToMany(() => CommentEntity, (comment) => comment.parent)
-	children_comments: CommentEntity[];
+	children_comments!: CommentEntity[];
 
 	@Column('uuid', { nullable: true })
-	replyId: string; //실제 답글을 달고자 하는 댓글 uid 해당 uid로 user.name을 알아내서 replyUserName 담음.
+	replyId?: string; //실제 답글을 달고자 하는 댓글 uid 해당 uid로 user.name을 알아내서 replyUserName 담음.
 
 	@Column('uuid')
-	userId: string;
+	userId!: string;
 
 	@ManyToOne(() => UserEntity, (user) => user.comments)
-	user: UserEntity;
+	user!: UserEntity;
 
 	@Column('uuid')
-	postId: string;
+	postId!: string;
 
 	@ManyToOne(() => PostEntity, (post) => post.comments)
-	post: PostEntity;
+	post!: PostEntity;
 
 	@Exclude()
 	@OneToMany(() => UserLikeCommentEntity, (ula) => ula.comment)
-	commentLikedByUsers: UserLikeCommentEntity[];
+	commentLikedByUsers!: UserLikeCommentEntity[];
 
 	@CreateDateColumn({
 		type: 'timestamp',
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	createdAt: Date;
+	createdAt!: Date;
 
 	@UpdateDateColumn({
 		type: 'timestamp',
@@ -61,9 +61,9 @@ export class CommentEntity {
 		default: () => 'CURRENT_TIMESTAMP',
 		// onUpdate: 'CURRENT_TIMESTAMP', mysql에서만 작동
 	})
-	updatedAt: Date;
+	updatedAt!: Date;
 
-	protected userLike: number;
+	protected userLike!: number;
 
 	setUserLike(userId: string) {
 		const index = this.commentLikedByUsers?.findIndex(

@@ -1,23 +1,23 @@
 export class CommentDto {
-	id: string;
+	id!: string;
 
-	comment_content: string;
+	comment_content!: string;
 
 	parentId?: string;
 
-	userId: string;
+	userId!: string;
 
-	writer: string;
+	writer!: string;
 
 	replyId?: string;
 
-	likes: number;
+	likes!: number;
 
 	mylike?: number;
 
 	replyUserName?: string;
 
-	updatedAt: Date;
+	updatedAt!: Date;
 
 	children_comments?: CommentDto[];
 }

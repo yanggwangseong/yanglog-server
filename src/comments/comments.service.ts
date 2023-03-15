@@ -44,7 +44,9 @@ export class CommentsService {
 				const newChildComments = await Promise.all(
 					comment.children_comments?.map(async (child): Promise<CommentDto> => {
 						const [replyUserName, writeUserName, likes] = await Promise.all([
-							await this.getUserNameByCommentId(child.replyId),
+							child.replyId
+								? await this.getUserNameByCommentId(child.replyId)
+								: '',
 							await this.getUserNameByCommentId(child.id),
 							this.userLikeCommentsRepository
 								.createQueryBuilder('ula')
@@ -53,7 +55,7 @@ export class CommentsService {
 								.getRawOne(),
 						]);
 
-						let value: number;
+						let value: number = 0;
 						if (userId) {
 							value = await this.getUserLikeCommentValue(userId, child.id);
 						}
@@ -101,6 +103,8 @@ export class CommentsService {
 			},
 			relations: ['user'],
 		});
+
+		if (!comment) throw new NotFoundException('댓글이 존재 하지 않습니다.');
 
 		return comment.user.name;
 	}

@@ -2,17 +2,17 @@ import { ArrayMinSize, IsNumber, IsString } from 'class-validator';
 
 export class CategoryDTO {
 	@IsString()
-	id: string;
+	id!: string;
 
 	@IsString()
-	category_name: string;
+	category_name!: string;
 
 	@IsString()
-	parentId: string;
+	parentId?: string;
 
 	@IsNumber()
-	priority: number; // 카테고리 순서
+	priority!: number; // 카테고리 순서
 
 	@ArrayMinSize(0)
-	children: CategoryDTO[];
+	children!: CategoryDTO[];
 }
