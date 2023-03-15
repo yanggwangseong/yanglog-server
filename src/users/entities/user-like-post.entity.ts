@@ -30,7 +30,7 @@ export class UserLikePostEntity {
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	createdAt: Date;
+	createdAt!: Date;
 
 	@UpdateDateColumn({
 		type: 'timestamp',
@@ -38,5 +38,5 @@ export class UserLikePostEntity {
 		default: () => 'CURRENT_TIMESTAMP',
 		// onUpdate: 'CURRENT_TIMESTAMP', mysql에서만 작동
 	})
-	updatedAt: Date;
+	updatedAt!: Date;
 }

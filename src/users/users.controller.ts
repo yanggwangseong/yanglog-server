@@ -26,6 +26,10 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
 import { AuthResponse } from './interfaces/auth.response.interface';
 import { GoogleGuard } from 'src/guards/google.guard';
+import {
+	AuthenticatedRequest,
+	GoogleAuthRequest,
+} from './interfaces/req.interface';
 
 @Controller('users')
 export class UsersController {
@@ -90,7 +94,7 @@ export class UsersController {
 	@UseGuards(AccessTokenGuard)
 	@Post('/logout')
 	logout(
-		@Req() req: Request,
+		@Req() req: AuthenticatedRequest,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<{ logout: boolean }> {
 		res.clearCookie('Authentication', {
@@ -105,7 +109,7 @@ export class UsersController {
 	@UseGuards(refreshTokenGuard)
 	@Get('/refreshtoken')
 	async refreshTokens(
-		@Req() req: Request,
+		@Req() req: AuthenticatedRequest,
 		@Res({ passthrough: true }) res: Response,
 	) {
 		const id = req.user['sub'];
@@ -126,7 +130,7 @@ export class UsersController {
 	//@UseGuards(AccessTokenGuard, RolesGuard)
 	@UseGuards(AccessTokenGuard)
 	@Get('/checkUser')
-	async checkUser(@Req() req: Request) {
+	async checkUser(@Req() req: AuthenticatedRequest) {
 		const id = req.user['sub'];
 		//const user = await this.userService.checkUser(id);
 
@@ -154,7 +158,10 @@ export class UsersController {
 	//GET(google/callback)
 	@Get('/google/callback')
 	@UseGuards(GoogleGuard)
-	async googleCallBackAuth(@Req() req: Request, @Res() res: Response) {
+	async googleCallBackAuth(
+		@Req() req: GoogleAuthRequest,
+		@Res() res: Response,
+	) {
 		const email: string = req.user['email'];
 		const photo: string = req.user['photo'];
 		const firstName: string = req.user['firstName'];

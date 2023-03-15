@@ -20,7 +20,7 @@ export class UserLikeCommentEntity {
 	public readonly commentId!: string;
 
 	@Column({ default: 0 })
-	value: number;
+	value!: number;
 
 	@ManyToOne((type) => UserEntity, (user) => user.userLikesComments)
 	@JoinColumn({ name: 'userId', referencedColumnName: 'id' })
@@ -35,7 +35,7 @@ export class UserLikeCommentEntity {
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	createdAt: Date;
+	createdAt!: Date;
 
 	@UpdateDateColumn({
 		type: 'timestamp',
@@ -43,5 +43,5 @@ export class UserLikeCommentEntity {
 		default: () => 'CURRENT_TIMESTAMP',
 		// onUpdate: 'CURRENT_TIMESTAMP', mysql에서만 작동
 	})
-	updatedAt: Date;
+	updatedAt!: Date;
 }

@@ -95,6 +95,10 @@ export class UsersService {
 			},
 		});
 
+		if (!user) {
+			throw new NotFoundException('유저가 존재하지 않습니다.');
+		}
+
 		const tokens = await this.getTokens(user.id, user.name, user.role);
 		await this.updateRefreshToken(user.id, tokens.refreshToken);
 
@@ -181,12 +185,16 @@ export class UsersService {
 		return { logout: true };
 	}
 
-	async updateRefreshToken(id: string, refreshToken: string) {
+	async updateRefreshToken(id: string, refreshToken: string | null) {
 		const user = await this.usersRepository.findOneBy({ id: id });
 		let hashedRefreshToken = '';
 		if (refreshToken !== null) {
 			hashedRefreshToken = await this.hashData(refreshToken);
 		}
+		if (!user) {
+			throw new NotFoundException('유저가 존재하지 않습니다.');
+		}
+
 		user.refreshToken = hashedRefreshToken;
 		await this.usersRepository.save(user);
 	}

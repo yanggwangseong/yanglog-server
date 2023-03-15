@@ -23,36 +23,36 @@ export enum UserRole {
 @Unique(['email'])
 export class UserEntity {
 	@PrimaryColumn('uuid')
-	id: string;
+	id!: string;
 
 	@Column('varchar', { length: 30 })
-	name: string;
+	name!: string;
 
 	@Column('varchar', { length: 60 })
-	email: string;
+	email!: string;
 
 	@Column('varchar', { length: 60 })
-	password: string;
+	password!: string;
 
 	@Column('varchar', { length: 60 })
-	signupVerifyToken: string;
+	signupVerifyToken!: string;
 
 	@Column('varchar', { length: 60, nullable: true })
-	refreshToken: string | null;
+	refreshToken?: string | null;
 
 	@Column({
 		type: 'enum',
 		enum: UserRole,
 		default: UserRole.USER,
 	})
-	role: UserRole;
+	role!: UserRole;
 
 	@CreateDateColumn({
 		type: 'timestamp',
 		precision: 3,
 		default: () => 'CURRENT_TIMESTAMP',
 	})
-	createdAt: Date;
+	createdAt!: Date;
 
 	@UpdateDateColumn({
 		type: 'timestamp',
@@ -60,7 +60,7 @@ export class UserEntity {
 		default: () => 'CURRENT_TIMESTAMP',
 		// onUpdate: 'CURRENT_TIMESTAMP', mysql에서만 작동
 	})
-	updatedAt: Date;
+	updatedAt!: Date;
 
 	@OneToMany(() => UserLikePostEntity, (ula) => ula.user)
 	userLikesPosts?: UserLikePostEntity[];
@@ -69,8 +69,8 @@ export class UserEntity {
 	userLikesComments?: UserLikeCommentEntity[];
 
 	@OneToMany((type) => PostEntity, (post) => post.user, { eager: false })
-	posts: PostEntity[];
+	posts!: PostEntity[];
 
 	@OneToMany(() => CommentEntity, (comment) => comment.userId)
-	comments: CommentEntity[];
+	comments!: CommentEntity[];
 }

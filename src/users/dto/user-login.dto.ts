@@ -4,9 +4,9 @@ export class UserLoginDto {
 	@IsString()
 	@IsEmail()
 	@MaxLength(60)
-	email: string;
+	email!: string;
 
 	@IsString()
 	@Matches(/^[A-Za-z\d!@#$%^&*()]{8,30}$/)
-	password: string;
+	password!: string;
 }
