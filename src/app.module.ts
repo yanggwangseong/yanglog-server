@@ -23,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
 import { ManageModule } from './manage/manage.module';
 import { CommentsModule } from './comments/comments.module';
 import { SearchService } from './search/search.service';
+import { NotificationsModule } from './notifications/notifications.module';
 import * as winston from 'winston';
 
 @Module({
@@ -52,6 +53,7 @@ import * as winston from 'winston';
 		AuthModule,
 		ManageModule,
 		CommentsModule,
+		NotificationsModule,
 	],
 	controllers: [],
 	providers: [SearchService],

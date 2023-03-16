@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { UserLikePostEntity } from './user-like-post.entity';
 import { UserLikeCommentEntity } from './user-like-comment.entity';
+import { NotificationEntity } from '../../notifications/entities/notification.entity';
 
 export enum UserRole {
 	ADMIN = 'admin',
@@ -73,4 +74,10 @@ export class UserEntity {
 
 	@OneToMany(() => CommentEntity, (comment) => comment.userId)
 	comments!: CommentEntity[];
+
+	@OneToMany(() => NotificationEntity, (uri) => uri.recipient)
+	userRecipients!: NotificationEntity[];
+
+	@OneToMany(() => NotificationEntity, (us) => us.sender)
+	userSenders!: NotificationEntity[];
 }

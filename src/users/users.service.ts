@@ -88,6 +88,7 @@ export class UsersService {
 			userId: createUser.id,
 		};
 	}
+
 	async signInGoogleUser(email: string) {
 		const user = await this.usersRepository.findOne({
 			where: {
