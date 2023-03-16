@@ -7,10 +7,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CommentDto } from './dto/comment.dto';
 import { UserLikeCommentEntity } from 'src/users/entities/user-like-comment.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class CommentsService {
 	constructor(
+		private notificationsService: NotificationsService,
 		@InjectRepository(CommentEntity)
 		private commentsRepository: Repository<CommentEntity>,
 		@InjectRepository(UserLikeCommentEntity)
@@ -125,6 +127,13 @@ export class CommentsService {
 		comment.postId = dto.postId;
 		comment.userId = userId;
 		comment.replyId = dto.replyId;
+
+		// [Todo] 게시글에 코멘트를 작성 했을 때 게시글 작성자에게 알람이 감.
+		this.notificationsService.sendPostCommentNotification(dto.postId, userId);
+
+		// [Todo] 답댓글을 작성 했을때 원댓글 작성자에게 알람이 가게.
+
+		// 트랜잭션 필수
 
 		await this.commentsRepository.save(comment);
 	}
