@@ -61,22 +61,6 @@ export class PostsService {
 		};
 	}
 
-	async getUserIdByPostId(postId: string) {
-		const post = await this.postsRepository.findOne({
-			select: {
-				user: {
-					id: true,
-				},
-			},
-			where: { id: postId },
-			relations: ['user'],
-		});
-
-		if (!post) throw new NotFoundException(`포스트가 존재하지 않습니다.`);
-
-		return post.userId;
-	}
-
 	async searchPosts(keyword: string, option: string, sort: string) {
 		let query = this.postsRepository
 			.createQueryBuilder('a')

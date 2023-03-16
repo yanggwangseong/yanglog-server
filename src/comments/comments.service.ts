@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CommentEntity } from './entities/comment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -12,6 +12,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 @Injectable()
 export class CommentsService {
 	constructor(
+		private dataSource: DataSource,
 		private notificationsService: NotificationsService,
 		@InjectRepository(CommentEntity)
 		private commentsRepository: Repository<CommentEntity>,
@@ -120,22 +121,43 @@ export class CommentsService {
 	}
 
 	async createComment(userId: string, dto: CreateCommentDto): Promise<void> {
-		const comment = new CommentEntity();
-		comment.id = uuidv4();
-		comment.comment_content = dto.comment_content;
-		comment.parentId = dto.parentId;
-		comment.postId = dto.postId;
-		comment.userId = userId;
-		comment.replyId = dto.replyId;
+		const queryRunner = this.dataSource.createQueryRunner();
+		await queryRunner.connect();
+		await queryRunner.startTransaction();
+		try {
+			const comment = new CommentEntity();
+			comment.id = uuidv4();
+			comment.comment_content = dto.comment_content;
+			comment.parentId = dto.parentId;
+			comment.postId = dto.postId;
+			comment.userId = userId;
+			comment.replyId = dto.replyId;
 
-		// [Todo] 게시글에 코멘트를 작성 했을 때 게시글 작성자에게 알람이 감.
-		this.notificationsService.sendPostCommentNotification(dto.postId, userId);
+			await queryRunner.manager.save(comment);
 
-		// [Todo] 답댓글을 작성 했을때 원댓글 작성자에게 알람이 가게.
-
-		// 트랜잭션 필수
-
-		await this.commentsRepository.save(comment);
+			//트랜잭션 테스트 위한 에러발생
+			//throw new InternalServerErrorException();
+			if (comment.replyId) {
+				this.notificationsService.sendReplyCommentNotification(
+					comment.postId,
+					userId,
+					comment.replyId,
+				);
+			} else {
+				this.notificationsService.sendPostCommentNotification(
+					dto.postId,
+					userId,
+				);
+			}
+			await queryRunner.commitTransaction();
+		} catch (e) {
+			console.log(e);
+			await queryRunner.rollbackTransaction();
+			throw e;
+			//return false;
+		} finally {
+			await queryRunner.release();
+		}
 	}
 
 	async updateCommentById(

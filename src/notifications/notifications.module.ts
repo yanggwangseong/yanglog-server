@@ -4,10 +4,8 @@ import { NotificationsController } from './notifications.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationEntity } from './entities/notification.entity';
 import { NotificationTypeEntity } from './entities/notification-type.entity';
-import { PostsModule } from '../posts/posts.module';
-import { PostsService } from '../posts/posts.service';
 import { PostEntity } from '../posts/entities/post.entity';
-import { UserLikePostEntity } from '../users/entities/user-like-post.entity';
+import { CommentEntity } from '../comments/entities/comment.entity';
 
 @Module({
 	imports: [
@@ -15,11 +13,11 @@ import { UserLikePostEntity } from '../users/entities/user-like-post.entity';
 			NotificationEntity,
 			NotificationTypeEntity,
 			PostEntity,
-			UserLikePostEntity,
+			CommentEntity,
 		]),
 	],
 	controllers: [NotificationsController],
-	providers: [NotificationsService, PostsService],
+	providers: [NotificationsService],
 	exports: [NotificationsService],
 })
 export class NotificationsModule {}

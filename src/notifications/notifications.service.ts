@@ -1,16 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotificationEntity } from './entities/notification.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
-import { PostsService } from '../posts/posts.service';
+import {
+	AlarmType,
+	NotificationTypeEntity,
+} from './entities/notification-type.entity';
+import { PostEntity } from '../posts/entities/post.entity';
+import { CommentEntity } from '../comments/entities/comment.entity';
 
 @Injectable()
 export class NotificationsService {
 	constructor(
-		private postsService: PostsService,
+		@InjectRepository(PostEntity)
+		private postsRepository: Repository<PostEntity>,
+		@InjectRepository(CommentEntity)
+		private commentsRepository: Repository<PostEntity>,
 		@InjectRepository(NotificationEntity)
 		private notificationsRepository: Repository<NotificationEntity>,
+		@InjectRepository(NotificationTypeEntity)
+		private notificationTypeRepository: Repository<NotificationTypeEntity>,
 	) {}
 
 	async getNotificationAll(userId: string) {
@@ -48,20 +58,79 @@ export class NotificationsService {
 	}
 
 	async sendPostCommentNotification(postId: string, userId: string) {
-		const recipientId = await this.postsService.getUserIdByPostId(postId);
+		const typeId = await this.getNotificationTypeById(
+			AlarmType.CommentOnMyPost,
+		);
+
+		const recipientId = await this.postsRepository.findOne({
+			select: {
+				userId: true,
+			},
+			where: {
+				id: postId,
+			},
+		});
+
+		if (!recipientId) {
+			throw new NotFoundException('게시글 ID에 해당하는 유저ID가 없습니다.');
+		}
 
 		await this.notificationsRepository.save({
 			id: uuidv4(),
-			recipientId: recipientId,
+			recipientId: recipientId.userId,
 			senderId: userId,
 			notification_title: '내 게시물에 새로운 댓글이 달렸습니다.',
 			postId: postId,
 			notifaction_description: '내 게시물에 댓글을 작성 하였습니다.',
-			typeId: '96ebc4bc-e2f0-4707-9d11-a4af1396f3b5',
+			typeId: typeId,
 		});
 	}
 
-	//[Todo]sendPostCommentNotification : 게시글에 코멘트를 작성 했을 때 게시글 작성자에게 알림을 보냅니다.
+	async sendReplyCommentNotification(
+		postId: string,
+		userId: string,
+		replyId: string,
+	) {
+		//commentId로 해당 comment 작성자의 userId를 구함.
+		const recipientId = await this.commentsRepository.findOne({
+			select: {
+				userId: true,
+			},
+			where: {
+				id: replyId,
+			},
+		});
+		if (!recipientId) {
+			throw new NotFoundException('게시글 ID에 해당하는 유저ID가 없습니다.');
+		}
+		const typeId = await this.getNotificationTypeById(
+			AlarmType.ReplyOnMyComment,
+		);
+		await this.notificationsRepository.save({
+			id: uuidv4(),
+			recipientId: recipientId.userId,
+			senderId: userId,
+			notification_title: '내 댓글에 새로운 답글이 달렸습니다.',
+			postId: postId,
+			notifaction_description: '내 댓글에 답글을 작성 하였습니다.',
+			typeId: typeId,
+		});
+	}
 
-	//[Todo]sendReplyCommentNotification : 게시글에 코멘트를 작성 했을 때 게시글 작성자에게 알림을 보냅니다.
+	private async getNotificationTypeById(alramType: AlarmType) {
+		const type = await this.notificationTypeRepository.findOne({
+			select: {
+				id: true,
+			},
+			where: {
+				type: alramType,
+			},
+		});
+
+		if (!type) {
+			throw new NotFoundException('해당하는 알람 타입이 존재 하지 않습니다.');
+		}
+
+		return type.id;
+	}
 }
