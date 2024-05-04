@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import { SuccessInterceptor } from './interceptors';
 
 dotenv.config({
 	path: path.resolve(
@@ -30,6 +31,7 @@ async function bootstrap() {
 			transform: true,
 		}),
 	);
+	//app.useGlobalInterceptors(new SuccessInterceptor());
 	//cookieParser
 	app.use(cookieParser());
 	await app.listen(3001);

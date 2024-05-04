@@ -84,8 +84,9 @@ export class PostsService {
 			query.getRawMany(),
 			query.getCount(),
 		]);
+
 		return {
-			list: list.map((post) => {
+			list: list.map((post): PostType => {
 				return {
 					id: post.id,
 					title: post.title,

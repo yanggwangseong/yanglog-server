@@ -48,6 +48,7 @@ export class NotificationsService {
 					id: item.id,
 					title: item.notification_title,
 					description: `${item.sender.name}님께서 ${item.notifaction_description}`,
+					postId: item.postId,
 					sendDate: item.createdAt,
 					sender: item.sender.name,
 					senderImg: '/images/author/profile.jpeg',

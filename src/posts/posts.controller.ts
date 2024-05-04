@@ -9,6 +9,7 @@ import {
 	Delete,
 	Req,
 	Query,
+	HttpCode,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -112,6 +113,7 @@ export class PostsController {
 	}
 
 	@UseGuards(AccessTokenGuard)
+	@HttpCode(204)
 	@Delete(':postId/comments/:commentId')
 	async deleteCommentById(
 		@Param('commentId') commentId: string,

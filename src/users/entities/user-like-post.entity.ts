@@ -21,7 +21,7 @@ export class UserLikePostEntity {
 	@JoinColumn({ name: 'userId', referencedColumnName: 'id' })
 	user!: UserEntity;
 
-	@ManyToOne((type) => PostEntity, (user) => user.postLikedByUsers)
+	@ManyToOne((type) => PostEntity, (post) => post.postLikedByUsers)
 	@JoinColumn({ name: 'postId', referencedColumnName: 'id' })
 	post!: PostEntity;
 

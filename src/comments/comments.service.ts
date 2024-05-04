@@ -174,10 +174,11 @@ export class CommentsService {
 			id: commentId,
 		});
 
-		if (result.affected === 0)
+		if (result.affected === 0) {
 			throw new NotFoundException(
 				`Could not find comment with id ${commentId}`,
 			);
+		}
 	}
 
 	async updateLikesCommentId(userId: string, commentId: string, value: number) {
